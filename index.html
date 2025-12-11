@@ -96,91 +96,6 @@
             50% { opacity: 0; }
         }
         
-        /* 主人模式指示器 */
-        #admin-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, #6751b9, #8a74f9);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            z-index: 1000;
-            box-shadow: 0 3px 10px rgba(103, 81, 185, 0.3);
-            display: none;
-        }
-        
-        /* 登录模态框 */
-        #login-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .login-box {
-            background: rgba(25, 30, 40, 0.95);
-            border-radius: 12px;
-            padding: 40px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(103, 81, 185, 0.5);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-        
-        .login-title {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #fff;
-            font-size: 1.5rem;
-        }
-        
-        .login-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            background: rgba(15, 20, 30, 0.8);
-            border: 1px solid rgba(103, 81, 185, 0.3);
-            border-radius: 8px;
-            color: #e8eaed;
-            font-size: 1rem;
-        }
-        
-        .login-input:focus {
-            outline: none;
-            border-color: #6751b9;
-        }
-        
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #6751b9, #8a74f9);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .login-btn:hover {
-            background: linear-gradient(135deg, #5a46a5, #7a65e0);
-        }
-        
-        .login-hint {
-            text-align: center;
-            margin-top: 15px;
-            color: #a0aec0;
-            font-size: 0.9rem;
-        }
-        
         /* 主要内容布局 */
         .layout_container {
             display: flex;
@@ -347,7 +262,7 @@
             color: #a0aec0;
         }
         
-        /* 心情卡片 */
+        /* 可编辑心情卡片 */
         .mood-card {
             position: relative;
         }
@@ -363,20 +278,11 @@
             transition: all 0.3s;
         }
         
-        .mood-content.readonly {
-            cursor: default;
-            border: 1px solid rgba(103, 81, 185, 0.2);
-        }
-        
-        .mood-content.readonly:hover {
-            border-color: rgba(103, 81, 185, 0.2);
-        }
-        
-        .mood-content.editable:hover {
+        .mood-content:hover {
             border-color: rgba(103, 81, 185, 0.5);
         }
         
-        .mood-content.editable:focus {
+        .mood-content:focus {
             outline: none;
             border-color: #6751b9;
             background: rgba(15, 20, 30, 0.8);
@@ -493,13 +399,6 @@
             border-color: rgba(103, 81, 185, 0.5);
         }
         
-        .btn-disabled {
-            background: rgba(255, 255, 255, 0.05);
-            color: #666;
-            cursor: not-allowed;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
         .btn-small {
             padding: 8px 15px;
             font-size: 0.85rem;
@@ -530,7 +429,7 @@
             font-size: 0.9rem;
         }
         
-        /* 想法卡片 */
+        /* 想法卡片 - 增强版 */
         .thoughts-card {
             padding-bottom: 10px;
         }
@@ -589,11 +488,6 @@
         .image-upload-btn:hover {
             background: rgba(103, 81, 185, 0.4);
             color: white;
-        }
-        
-        .image-upload-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
         
         .image-upload-input {
@@ -734,21 +628,11 @@
             color: #8a74f9;
         }
         
-        .thought-action.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
         .delete-thought {
             margin-left: auto;
             color: #e53e3e;
             cursor: pointer;
             font-size: 0.9rem;
-            display: none;
-        }
-        
-        .delete-thought.visible {
-            display: block;
         }
         
         /* 音乐播放器 */
@@ -763,24 +647,6 @@
             border-top: 1px solid rgba(103, 81, 185, 0.3);
             color: #a0aec0;
             font-size: 0.9rem;
-        }
-        
-        /* 访客提示 */
-        .guest-hint {
-            background: rgba(103, 81, 185, 0.1);
-            border: 1px solid rgba(103, 81, 185, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #c3b5f5;
-        }
-        
-        .login-link {
-            color: #8a74f9;
-            text-decoration: underline;
-            cursor: pointer;
         }
         
         /* 响应式设计 */
@@ -819,36 +685,11 @@
                 width: 100%;
                 height: 200px;
             }
-            
-            .login-box {
-                padding: 25px;
-                width: 95%;
-            }
         }
     </style>
 </head>
 
 <body>
-    <!-- 主人模式指示器 -->
-    <div id="admin-indicator">
-        <i class="fa fa-user-secret"></i> 主人模式
-    </div>
-    
-    <!-- 登录模态框 -->
-    <div id="login-modal">
-        <div class="login-box">
-            <h2 class="login-title">主人登录</h2>
-            <input type="password" id="login-password" class="login-input" placeholder="请输入密码" autocomplete="off">
-            <button class="login-btn" onclick="checkLogin()">进入主人模式</button>
-            <div class="login-hint">
-                首次使用？默认密码：<span id="default-password">baive2023</span>
-            </div>
-            <div class="login-hint" style="margin-top: 10px;">
-                <a href="javascript:void(0)" onclick="enterGuestMode()">或者以访客身份浏览</a>
-            </div>
-        </div>
-    </div>
-    
     <div id="body-wrap">
         <!-- 导航栏 -->
         <nav>
@@ -891,14 +732,9 @@
                             <i class="fa fa-zhihu"></i>
                         </a>
                     </div>
-                    
-                    <div id="login-hint" class="guest-hint" style="display: none;">
-                        您是访客模式<br>
-                        <span class="login-link" onclick="showLogin()">点击这里登录主人模式</span>
-                    </div>
                 </div>
 
-                <!-- 心情卡片 -->
+                <!-- 可编辑心情卡片 -->
                 <div class="card mood-card">
                     <div class="card-header">
                         <div class="card-icon">
@@ -907,16 +743,19 @@
                         <h3 class="card-title">今日心情</h3>
                     </div>
                     <div 
-                        class="mood-content readonly" 
-                        id="mood-content"
-                        data-placeholder="主人今天还没有分享心情..."
+                        class="mood-content" 
+                        id="mood-content" 
+                        contenteditable="true"
+                        data-placeholder="点击编辑今日心情..."
+                        onfocus="if(this.innerText === '点击编辑今日心情...') this.innerText = ''"
+                        onblur="if(this.innerText.trim() === '') this.innerText = '点击编辑今日心情...'"
                     >今天专注学习了5小时，完成了数学分析和前端项目，继续加油！</div>
                     <div class="mood-actions" id="mood-actions" style="display: none;">
                         <button class="mood-btn" onclick="cancelEditMood()">取消</button>
                         <button class="mood-btn mood-btn-primary" onclick="saveMood()">保存</button>
                     </div>
-                    <div id="mood-guest-hint" class="guest-hint" style="display: none;">
-                        这是主人的心情，仅主人可以编辑
+                    <div class="mood-info">
+                        <small style="color: #a0aec0; font-size: 0.8rem;">点击上方文本框编辑心情，支持换行和Emoji</small>
                     </div>
                 </div>
 
@@ -975,19 +814,19 @@
                     </div>
                     
                     <div class="controls-grid">
-                        <button class="btn btn-disabled" id="start-btn" disabled>
+                        <button class="btn btn-primary" id="start-btn">
                             <i class="fa fa-play"></i> 开始专注
                         </button>
                         <button class="btn btn-secondary" id="pause-btn" style="display:none">
                             <i class="fa fa-pause"></i> 暂停
                         </button>
-                        <button class="btn btn-disabled" id="reset-btn" disabled>
+                        <button class="btn btn-secondary" id="reset-btn">
                             <i class="fa fa-refresh"></i> 重置
                         </button>
-                        <button class="btn btn-disabled btn-small" id="short-break" disabled>
+                        <button class="btn btn-secondary btn-small" id="short-break">
                             <i class="fa fa-coffee"></i> 短休息
                         </button>
-                        <button class="btn btn-disabled btn-small" id="long-break" disabled>
+                        <button class="btn btn-secondary btn-small" id="long-break">
                             <i class="fa fa-bed"></i> 长休息
                         </button>
                     </div>
@@ -995,16 +834,13 @@
                     <div class="pomodoro-history">
                         <h4 class="history-title">今日专注记录</h4>
                         <div class="history-list" id="history-list">
-                            <div class="history-item">请登录主人模式使用番茄钟功能</div>
+                            <!-- 历史记录将在这里动态生成 -->
+                            <div class="history-item">今天还没有记录，开始第一个番茄钟吧！</div>
                         </div>
-                    </div>
-                    <div id="pomodoro-guest-hint" class="guest-hint">
-                        番茄钟功能仅限主人使用<br>
-                        <span class="login-link" onclick="showLogin()">点击登录主人模式</span>
                     </div>
                 </div>
 
-                <!-- 想法卡片 -->
+                <!-- 想法卡片（支持图片上传） -->
                 <div class="card thoughts-card">
                     <div class="card-header">
                         <div class="card-icon">
@@ -1013,14 +849,14 @@
                         <h3 class="card-title">今日想法</h3>
                     </div>
                     
-                    <div class="thought-input-container" id="thought-input-container" style="display: none;">
+                    <div class="thought-input-container">
                         <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
                         <div style="flex: 1;">
                             <textarea class="thought-input" id="new-thought" placeholder="分享你的想法、学习心得或有趣发现..."></textarea>
                             
                             <!-- 图片上传区域 -->
                             <div class="image-upload-container">
-                                <div class="image-upload-btn disabled" id="image-upload-btn" onclick="if(!isAdmin) return;">
+                                <div class="image-upload-btn" onclick="document.getElementById('image-upload').click()">
                                     <i class="fa fa-image"></i>
                                     <span>添加图片</span>
                                 </div>
@@ -1034,19 +870,72 @@
                             </div>
                             
                             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                                <button class="btn btn-disabled" id="post-thought" disabled>发布想法</button>
+                                <button class="btn btn-primary" id="post-thought">发布想法</button>
                             </div>
                         </div>
                     </div>
                     
-                    <div id="thought-guest-hint" class="guest-hint">
-                        想法的发布功能仅限主人使用<br>
-                        您可以浏览主人已发布的想法<br>
-                        <span class="login-link" onclick="showLogin()">点击登录主人模式</span>
-                    </div>
-                    
                     <div class="thoughts-list" id="thoughts-list">
                         <!-- 想法列表将在这里动态生成 -->
+                        <div class="thought-item">
+                            <div class="thought-header">
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">2小时前</div>
+                                </div>
+                            </div>
+                            <div class="thought-content">
+                                今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！
+                            </div>
+                            <div class="thought-images">
+                                <!-- 示例图片 -->
+                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop')">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop" alt="示例图片">
+                                </div>
+                            </div>
+                            <div class="thought-actions">
+                                <div class="thought-action" onclick="likeThought(1)">
+                                    <i class="fa fa-thumbs-up"></i> 12
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-comment"></i> 5
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-share"></i> 分享
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="thought-item">
+                            <div class="thought-header">
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">昨天</div>
+                                </div>
+                            </div>
+                            <div class="thought-content">
+                                最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。
+                            </div>
+                            <div class="thought-images">
+                                <!-- 示例图片 -->
+                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w-400&auto=format&fit=crop')">
+                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop" alt="示例图片">
+                                </div>
+                            </div>
+                            <div class="thought-actions">
+                                <div class="thought-action" onclick="likeThought(2)">
+                                    <i class="fa fa-thumbs-up"></i> 24
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-comment"></i> 8
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-share"></i> 分享
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1055,10 +944,6 @@
         <footer>
             <div id="footer-wrap">
                 <div class="copyright">&copy; 2023 百夜 | 中山大学数学系 | All shall be well, and all shall be well, and all manner of things shall be well.</div>
-                <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                    当前模式: <span id="current-mode">访客</span> | 
-                    <a href="javascript:void(0)" onclick="logout()" style="color: #8a74f9;">退出登录</a>
-                </div>
             </div>
         </footer>
     </div>
@@ -1078,15 +963,7 @@
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
     
     <script>
-        // 全局状态
-        let isAdmin = false;
-        let originalMood = '';
-        let uploadedImages = [];
-        
         $(document).ready(function() {
-            // 检查登录状态
-            checkAdminStatus();
-            
             // 初始化动态标题
             var typed = new Typed(".blogtitle", {
                 strings: ['百夜 | 学术与二次元', '百夜 | 数学与编程', '百夜 | 专注与创造'],
@@ -1123,23 +1000,43 @@
                 theme: '#6751b9'
             });
             
+            // 可编辑心情功能
+            let originalMood = '';
+            const moodContent = document.getElementById('mood-content');
+            const moodActions = document.getElementById('mood-actions');
+            
             // 加载保存的心情
             const savedMood = localStorage.getItem('dailyMood');
             if (savedMood) {
-                document.getElementById('mood-content').innerText = savedMood;
+                moodContent.innerText = savedMood;
             }
             
-            // 番茄钟功能（仅主人可用）
+            // 监听心情编辑
+            moodContent.addEventListener('focus', function() {
+                originalMood = this.innerText;
+                if (this.innerText === '点击编辑今日心情...') {
+                    this.innerText = '';
+                }
+                moodActions.style.display = 'flex';
+            });
+            
+            moodContent.addEventListener('input', function() {
+                // 实时保存草稿
+                localStorage.setItem('moodDraft', this.innerText);
+            });
+            
+            // 番茄钟功能
             let timer;
             let minutes = 25;
             let seconds = 0;
             let isRunning = false;
             let isBreak = false;
             let completedCount = 0;
-            let totalFocusTime = 300;
+            let totalFocusTime = 300; // 5小时，单位：分钟
             let today = new Date().toDateString();
             
             // 加载存储的数据
+            loadPomodoroData();
             loadThoughts();
             
             // 初始化显示
@@ -1147,7 +1044,7 @@
             
             // 番茄钟功能函数
             function startTimer() {
-                if (!isRunning && isAdmin) {
+                if (!isRunning) {
                     isRunning = true;
                     timer = setInterval(updateTimer, 1000);
                     $('#start-btn').hide();
@@ -1193,6 +1090,14 @@
                             const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
                             audio.volume = 0.3;
                             audio.play();
+                            
+                            // 显示通知
+                            if (Notification.permission === 'granted') {
+                                new Notification('番茄钟完成', {
+                                    body: '恭喜完成一个番茄钟！休息一下吧～',
+                                    icon: 'https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg'
+                                });
+                            }
                             
                             $('#timer-status').html('<span style="color:#4ade80;">🍅 番茄钟完成！</span>');
                             startBreak(5);
@@ -1249,7 +1154,7 @@
                 
                 let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
                 history.push(record);
-                localStorage.setItem('pomodoroHistory', JSON.stringify(history.slice(-20)));
+                localStorage.setItem('pomodoroHistory', JSON.stringify(history.slice(-20))); // 只保留最近20条
                 
                 // 更新今日数据
                 const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
@@ -1263,6 +1168,14 @@
                 localStorage.setItem('todayStats', JSON.stringify(todayData));
                 
                 updateHistoryList();
+            }
+            
+            function loadPomodoroData() {
+                // 加载历史记录
+                updateHistoryList();
+                
+                // 加载统计数据
+                updateStats();
             }
             
             function updateHistoryList() {
@@ -1319,17 +1232,25 @@
                 $('#current-streak').text(streak);
             }
             
-            // 事件监听（仅当是主人时启用）
+            // 请求通知权限
+            if ('Notification' in window && Notification.permission === 'default') {
+                setTimeout(() => {
+                    Notification.requestPermission();
+                }, 2000);
+            }
+            
+            // 事件监听
             $('#start-btn').click(startTimer);
             $('#pause-btn').click(pauseTimer);
             $('#reset-btn').click(resetTimer);
             $('#short-break').click(() => startBreak(5));
             $('#long-break').click(() => startBreak(15));
             
+            // 图片上传相关变量
+            let uploadedImages = [];
+            
             // 说说功能 - 支持图片上传
             $('#post-thought').click(function() {
-                if (!isAdmin) return;
-                
                 const thought = $('#new-thought').val().trim();
                 if (thought || uploadedImages.length > 0) {
                     saveThought(thought, uploadedImages);
@@ -1348,12 +1269,12 @@
                     time: new Date().toLocaleString('zh-CN'),
                     likes: 0,
                     comments: 0,
-                    images: images
+                    images: images // 保存图片数据
                 };
                 
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
                 thoughts.unshift(thought);
-                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 20)));
+                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 20))); // 最多保存20条
                 
                 loadThoughts();
             }
@@ -1399,10 +1320,6 @@
                         imagesHtml += '</div>';
                     }
                     
-                    const deleteBtn = isAdmin ? 
-                        '<div class="delete-thought visible" onclick="deleteThought(' + thought.id + ')"><i class="fa fa-trash"></i> 删除</div>' : 
-                        '';
-                    
                     $('#thoughts-list').append(`
                         <div class="thought-item" data-id="${thought.id}">
                             <div class="thought-header">
@@ -1415,16 +1332,18 @@
                             <div class="thought-content">${thought.content}</div>
                             ${imagesHtml}
                             <div class="thought-actions">
-                                <div class="thought-action ${isAdmin ? '' : 'disabled'}" onclick="${isAdmin ? 'likeThought(' + thought.id + ')' : ''}">
+                                <div class="thought-action" onclick="likeThought(${thought.id})">
                                     <i class="fa fa-thumbs-up"></i> ${thought.likes}
                                 </div>
-                                <div class="thought-action disabled">
+                                <div class="thought-action">
                                     <i class="fa fa-comment"></i> ${thought.comments}
                                 </div>
-                                <div class="thought-action disabled">
+                                <div class="thought-action">
                                     <i class="fa fa-share"></i> 分享
                                 </div>
-                                ${deleteBtn}
+                                <div class="delete-thought" onclick="deleteThought(${thought.id})">
+                                    <i class="fa fa-trash"></i> 删除
+                                </div>
                             </div>
                         </div>
                     `);
@@ -1442,164 +1361,43 @@
                 }
             });
             
+            // 加载草稿
+            const moodDraft = localStorage.getItem('moodDraft');
+            if (moodDraft && moodDraft !== '点击编辑今日心情...') {
+                moodContent.innerText = moodDraft;
+            }
+            
             // 初始化
             updateStats();
             loadThoughts();
         });
         
-        // 检查管理员状态
-        function checkAdminStatus() {
-            const adminStatus = localStorage.getItem('isAdmin');
-            if (adminStatus === 'true') {
-                const savedPassword = localStorage.getItem('adminPassword');
-                const defaultPassword = 'baive2023'; // 默认密码
-                const timestamp = localStorage.getItem('adminLoginTime');
-                const now = Date.now();
-                
-                // 检查是否在有效期内（24小时）
-                if (timestamp && (now - parseInt(timestamp)) < 24 * 60 * 60 * 1000) {
-                    isAdmin = true;
-                    enterAdminMode(savedPassword || defaultPassword);
-                    return;
-                } else {
-                    // 登录已过期
-                    localStorage.removeItem('isAdmin');
-                    localStorage.removeItem('adminLoginTime');
-                }
-            }
-            
-            // 显示登录框
-            setTimeout(() => {
-                document.getElementById('login-modal').style.display = 'flex';
-            }, 500);
-        }
-        
-        // 检查登录
-        function checkLogin() {
-            const password = document.getElementById('login-password').value;
-            const defaultPassword = 'baive2023'; // 默认密码
-            
-            if (password === defaultPassword) {
-                enterAdminMode(password);
-                document.getElementById('login-modal').style.display = 'none';
-            } else {
-                alert('密码错误！请使用默认密码：baive2023');
-            }
-        }
-        
-        // 进入管理员模式
-        function enterAdminMode(password) {
-            isAdmin = true;
-            
-            // 保存登录状态
-            localStorage.setItem('isAdmin', 'true');
-            localStorage.setItem('adminPassword', password);
-            localStorage.setItem('adminLoginTime', Date.now().toString());
-            
-            // 更新UI
-            document.getElementById('admin-indicator').style.display = 'block';
-            document.getElementById('current-mode').textContent = '主人';
-            
-            // 更新心情卡片
-            const moodContent = document.getElementById('mood-content');
-            moodContent.className = 'mood-content editable';
-            moodContent.contentEditable = true;
-            document.getElementById('mood-guest-hint').style.display = 'none';
-            
-            // 更新番茄钟
-            $('#start-btn, #reset-btn, #short-break, #long-break')
-                .removeClass('btn-disabled')
-                .addClass('btn-primary')
-                .prop('disabled', false);
-            $('#start-btn').addClass('btn-primary').removeClass('btn-disabled');
-            $('#reset-btn').addClass('btn-secondary').removeClass('btn-disabled');
-            $('#short-break, #long-break').addClass('btn-secondary').removeClass('btn-disabled');
-            $('#pomodoro-guest-hint').hide();
-            
-            // 更新想法卡片
-            document.getElementById('thought-input-container').style.display = 'flex';
-            document.getElementById('image-upload-btn').className = 'image-upload-btn';
-            $('#post-thought').removeClass('btn-disabled').addClass('btn-primary').prop('disabled', false);
-            document.getElementById('thought-guest-hint').style.display = 'none';
-            
-            // 隐藏访客登录提示
-            document.getElementById('login-hint').style.display = 'none';
-            
-            // 重新加载想法（显示删除按钮）
-            loadThoughts();
-            
-            // 加载番茄钟历史
-            updateHistoryList();
-            
-            alert('欢迎回来，主人！');
-        }
-        
-        // 进入访客模式
-        function enterGuestMode() {
-            document.getElementById('login-modal').style.display = 'none';
-            document.getElementById('current-mode').textContent = '访客';
-            document.getElementById('login-hint').style.display = 'block';
-            document.getElementById('mood-guest-hint').style.display = 'block';
-            document.getElementById('pomodoro-guest-hint').style.display = 'block';
-            document.getElementById('thought-guest-hint').style.display = 'block';
-            
-            alert('您正在以访客身份浏览。部分功能仅限主人使用。');
-        }
-        
-        // 显示登录框
-        function showLogin() {
-            document.getElementById('login-modal').style.display = 'flex';
-        }
-        
-        // 退出登录
-        function logout() {
-            localStorage.removeItem('isAdmin');
-            localStorage.removeItem('adminLoginTime');
-            location.reload();
-        }
+        // 全局函数
         
         // 心情编辑相关函数
         function saveMood() {
-            if (!isAdmin) return;
-            
             const moodContent = document.getElementById('mood-content');
             const mood = moodContent.innerText.trim();
             
-            if (mood && mood !== '主人今天还没有分享心情...') {
+            if (mood && mood !== '点击编辑今日心情...') {
                 localStorage.setItem('dailyMood', mood);
+                localStorage.removeItem('moodDraft'); // 清除草稿
                 alert('心情保存成功！');
-                document.getElementById('mood-actions').style.display = 'none';
+                moodActions.style.display = 'none';
             } else {
                 alert('心情内容不能为空！');
             }
         }
         
         function cancelEditMood() {
-            if (!isAdmin) return;
-            
             const moodContent = document.getElementById('mood-content');
-            moodContent.innerText = originalMood || '主人今天还没有分享心情...';
-            document.getElementById('mood-actions').style.display = 'none';
+            moodContent.innerText = originalMood || '点击编辑今日心情...';
+            moodActions.style.display = 'none';
+            localStorage.removeItem('moodDraft'); // 清除草稿
         }
-        
-        // 监听心情编辑
-        document.getElementById('mood-content').addEventListener('focus', function() {
-            if (!isAdmin) return;
-            
-            originalMood = this.innerText;
-            if (this.innerText === '主人今天还没有分享心情...') {
-                this.innerText = '';
-            }
-            document.getElementById('mood-actions').style.display = 'flex';
-        });
         
         // 图片上传处理
         function handleImageUpload(event) {
-            if (!isAdmin) {
-                alert('请先登录主人模式！');
-                return;
-            }
-            
             const files = event.target.files;
             const previewContainer = document.getElementById('image-preview-container');
             
@@ -1653,8 +1451,6 @@
         
         // 移除已上传图片
         function removeImage(element, imageData) {
-            if (!isAdmin) return;
-            
             const previewItem = element.parentElement;
             previewItem.remove();
             
@@ -1676,10 +1472,8 @@
             document.getElementById('image-viewer').style.display = 'none';
         }
         
-        // 点赞想法（仅主人）
+        // 点赞想法
         function likeThought(id) {
-            if (!isAdmin) return;
-            
             let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
             const thoughtIndex = thoughts.findIndex(t => t.id === id);
             if (thoughtIndex !== -1) {
@@ -1691,10 +1485,8 @@
             }
         }
         
-        // 删除想法（仅主人）
+        // 删除想法
         function deleteThought(id) {
-            if (!isAdmin) return;
-            
             if (confirm('确定要删除这条想法吗？')) {
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
                 thoughts = thoughts.filter(thought => thought.id !== id);
@@ -1734,10 +1526,23 @@
         console.clear();
         console.log("%c 欢迎来到百夜的学术二次元空间！", "background: linear-gradient(90deg, #6751b9, #8a74f9); color:white; padding:10px; border-radius:5px; font-weight:bold", "");
         console.log("%c 这里融合了学术严谨与二次元趣味", "color: #a0aec0", "");
-        console.log("%c 当前模式: " + (isAdmin ? "主人模式" : "访客模式"), "background:#24272A; color:#ffffff; padding:3px 6px; border-radius:3px", "");
+        console.log("%c GitHub %c https://github.com", "background:#24272A; color:#ffffff; padding:3px 6px; border-radius:3px", "", "color: #60a5fa");
         
-        // 自动填充密码（开发时方便）
-        document.getElementById('login-password').value = 'baive2023';
+        // 点击图片上传区域外部时关闭心情编辑
+        document.addEventListener('click', function(event) {
+            const moodContent = document.getElementById('mood-content');
+            const moodActions = document.getElementById('mood-actions');
+            
+            if (!moodContent.contains(event.target) && !moodActions.contains(event.target)) {
+                if (moodActions.style.display === 'flex') {
+                    const currentMood = moodContent.innerText.trim();
+                    if (currentMood === '' || currentMood === '点击编辑今日心情...') {
+                        moodContent.innerText = originalMood || '点击编辑今日心情...';
+                    }
+                    moodActions.style.display = 'none';
+                }
+            }
+        });
     </script>
 </body>
 
