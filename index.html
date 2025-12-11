@@ -1057,4 +1057,688 @@
                 <div class="copyright">&copy; 2023 百夜 | 中山大学数学系 | All shall be well, and all shall be well, and all manner of things shall be well.</div>
                 <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
                     当前模式: <span id="current-mode">访客</span> | 
-                    <a href="javascript:void(0)" onclick="logout()
+                    <a href="javascript:void(0)" onclick="logout()" style="color: #8a74f9;">退出登录</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <div id="image-viewer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="position: relative; max-width: 90%; max-height: 90%;">
+            <img id="viewed-image" src="" alt="" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
+            <button onclick="closeImageViewer()" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">×</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+    
+    <script>
+        // 全局状态
+        let isAdmin = false;
+        let originalMood = '';
+        let uploadedImages = [];
+        
+        $(document).ready(function() {
+            // 检查登录状态
+            checkAdminStatus();
+            
+            // 初始化动态标题
+            var typed = new Typed(".blogtitle", {
+                strings: ['百夜 | 学术与二次元', '百夜 | 数学与编程', '百夜 | 专注与创造'],
+                startDelay: 300,
+                typeSpeed: 100,
+                loop: true,
+                backSpeed: 50,
+                showCursor: true
+            });
+            
+            // 初始化音乐播放器
+            const ap = new APlayer({
+                container: document.getElementById('aplayer'),
+                audio: [{
+                    name: '学习专注音乐',
+                    artist: '纯音乐',
+                    url: 'https://music.163.com/song/media/outer/url?id=1859245776.mp3',
+                    cover: 'https://p2.music.126.net/y-pQkLXU4Z5aXkQzSDSjag==/109951166118847666.jpg'
+                }, {
+                    name: '宁静钢琴曲',
+                    artist: '钢琴曲',
+                    url: 'https://music.163.com/song/media/outer/url?id=1392997646.mp3',
+                    cover: 'https://p1.music.126.net/5J1ZvhykLQxqKp5Wv-3X0w==/109951164119981465.jpg'
+                }, {
+                    name: '白噪音 - 雨声',
+                    artist: '自然声音',
+                    url: 'https://music.163.com/song/media/outer/url?id=1463165983.mp3',
+                    cover: 'https://p1.music.126.net/MJ8Nw-kr3wT9PEO8Dnl_qw==/109951164215003212.jpg'
+                }],
+                volume: 0.7,
+                fixed: false,
+                mini: false,
+                autoplay: false,
+                theme: '#6751b9'
+            });
+            
+            // 加载保存的心情
+            const savedMood = localStorage.getItem('dailyMood');
+            if (savedMood) {
+                document.getElementById('mood-content').innerText = savedMood;
+            }
+            
+            // 番茄钟功能（仅主人可用）
+            let timer;
+            let minutes = 25;
+            let seconds = 0;
+            let isRunning = false;
+            let isBreak = false;
+            let completedCount = 0;
+            let totalFocusTime = 300;
+            let today = new Date().toDateString();
+            
+            // 加载存储的数据
+            loadThoughts();
+            
+            // 初始化显示
+            updateDisplay();
+            
+            // 番茄钟功能函数
+            function startTimer() {
+                if (!isRunning && isAdmin) {
+                    isRunning = true;
+                    timer = setInterval(updateTimer, 1000);
+                    $('#start-btn').hide();
+                    $('#pause-btn').show();
+                    $('#timer-status').text('专注中...');
+                    document.title = `专注中 - ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 百夜`;
+                }
+            }
+            
+            function pauseTimer() {
+                isRunning = false;
+                clearInterval(timer);
+                $('#start-btn').show();
+                $('#pause-btn').hide();
+                $('#timer-status').text('已暂停');
+                document.title = `已暂停 - ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 百夜`;
+            }
+            
+            function resetTimer() {
+                pauseTimer();
+                minutes = isBreak ? 5 : 25;
+                seconds = 0;
+                updateDisplay();
+                $('#timer-status').text('准备开始');
+                document.title = '百夜 | 学术与二次元';
+            }
+            
+            function updateTimer() {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        // 时间到
+                        clearInterval(timer);
+                        isRunning = false;
+                        
+                        if (!isBreak) {
+                            // 完成一个番茄钟
+                            completedCount++;
+                            totalFocusTime += 25;
+                            savePomodoroRecord();
+                            updateStats();
+                            
+                            // 播放提示音
+                            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+                            audio.volume = 0.3;
+                            audio.play();
+                            
+                            $('#timer-status').html('<span style="color:#4ade80;">🍅 番茄钟完成！</span>');
+                            startBreak(5);
+                        } else {
+                            // 休息结束
+                            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3');
+                            audio.volume = 0.3;
+                            audio.play();
+                            
+                            $('#timer-status').html('<span style="color:#60a5fa;">休息结束，继续专注吧！</span>');
+                            isBreak = false;
+                            minutes = 25;
+                            seconds = 0;
+                            updateDisplay();
+                        }
+                        $('#start-btn').show();
+                        $('#pause-btn').hide();
+                        return;
+                    }
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                updateDisplay();
+            }
+            
+            function updateDisplay() {
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                $('#timer-display').text(display);
+                
+                // 动态更新标题
+                if (isRunning) {
+                    const prefix = isBreak ? '休息中 - ' : '专注中 - ';
+                    document.title = prefix + display + ' | 百夜';
+                }
+            }
+            
+            function startBreak(minutesBreak) {
+                isBreak = true;
+                minutes = minutesBreak;
+                seconds = 0;
+                isRunning = false;
+                updateDisplay();
+                $('#timer-status').html(`<span style="color:#fbbf24;">休息中 - ${minutesBreak}分钟</span>`);
+            }
+            
+            function savePomodoroRecord() {
+                const record = {
+                    time: new Date().toLocaleString('zh-CN'),
+                    type: 'pomodoro',
+                    duration: 25
+                };
+                
+                let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                history.push(record);
+                localStorage.setItem('pomodoroHistory', JSON.stringify(history.slice(-20)));
+                
+                // 更新今日数据
+                const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
+                if (todayData.date !== today) {
+                    todayData.date = today;
+                    todayData.completed = 0;
+                    todayData.focusTime = 0;
+                }
+                todayData.completed++;
+                todayData.focusTime += 25;
+                localStorage.setItem('todayStats', JSON.stringify(todayData));
+                
+                updateHistoryList();
+            }
+            
+            function updateHistoryList() {
+                let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                const todayHistory = history.filter(record => {
+                    const recordDate = new Date(record.time).toDateString();
+                    return recordDate === today;
+                });
+                
+                $('#history-list').empty();
+                
+                if (todayHistory.length === 0) {
+                    $('#history-list').append('<div class="history-item">今天还没有记录，开始第一个番茄钟吧！</div>');
+                } else {
+                    todayHistory.slice(-5).reverse().forEach(record => {
+                        const time = record.time.split(' ')[1].substring(0, 5);
+                        $('#history-list').append(
+                            `<div class="history-item">
+                                <i class="fa fa-check-circle" style="color:#4ade80; margin-right:8px;"></i>
+                                ${time} - 完成25分钟专注
+                            </div>`
+                        );
+                    });
+                }
+            }
+            
+            function updateStats() {
+                const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
+                const history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                
+                // 计算今日专注时间
+                const todayFocus = todayData.focusTime || 0;
+                const todayHours = Math.floor(todayFocus / 60);
+                const todayMinutes = todayFocus % 60;
+                $('#focus-today').text(`${todayHours > 0 ? todayHours + 'h' : ''}${todayMinutes}m`);
+                
+                // 更新累计番茄钟
+                $('#total-pomodoro').text(history.length);
+                
+                // 计算连续天数
+                let dates = [...new Set(history.map(r => new Date(r.time).toDateString()))];
+                dates.sort((a, b) => new Date(b) - new Date(a));
+                
+                let streak = 0;
+                let currentDate = new Date();
+                for (let i = 0; i < dates.length; i++) {
+                    const expectedDate = new Date(currentDate - i * 24 * 60 * 60 * 1000).toDateString();
+                    if (dates.includes(expectedDate)) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                $('#current-streak').text(streak);
+            }
+            
+            // 事件监听（仅当是主人时启用）
+            $('#start-btn').click(startTimer);
+            $('#pause-btn').click(pauseTimer);
+            $('#reset-btn').click(resetTimer);
+            $('#short-break').click(() => startBreak(5));
+            $('#long-break').click(() => startBreak(15));
+            
+            // 说说功能 - 支持图片上传
+            $('#post-thought').click(function() {
+                if (!isAdmin) return;
+                
+                const thought = $('#new-thought').val().trim();
+                if (thought || uploadedImages.length > 0) {
+                    saveThought(thought, uploadedImages);
+                    $('#new-thought').val('');
+                    uploadedImages = [];
+                    $('#image-preview-container').empty();
+                } else {
+                    alert('请输入想法或上传图片！');
+                }
+            });
+            
+            function saveThought(content, images) {
+                const thought = {
+                    id: Date.now(),
+                    content: content,
+                    time: new Date().toLocaleString('zh-CN'),
+                    likes: 0,
+                    comments: 0,
+                    images: images
+                };
+                
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                thoughts.unshift(thought);
+                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 20)));
+                
+                loadThoughts();
+            }
+            
+            function loadThoughts() {
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                $('#thoughts-list').empty();
+                
+                if (thoughts.length === 0) {
+                    // 使用示例想法
+                    thoughts = [
+                        {
+                            id: 1,
+                            content: '今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！',
+                            time: '2小时前',
+                            likes: 12,
+                            comments: 5,
+                            images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop']
+                        },
+                        {
+                            id: 2,
+                            content: '最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。',
+                            time: '昨天',
+                            likes: 24,
+                            comments: 8,
+                            images: ['https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop']
+                        }
+                    ];
+                    localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                }
+                
+                thoughts.forEach(thought => {
+                    let imagesHtml = '';
+                    if (thought.images && thought.images.length > 0) {
+                        imagesHtml = '<div class="thought-images">';
+                        thought.images.forEach((img, index) => {
+                            imagesHtml += `
+                                <div class="thought-image-item" onclick="viewImage('${img}')">
+                                    <img src="${img}" alt="图片${index + 1}">
+                                </div>
+                            `;
+                        });
+                        imagesHtml += '</div>';
+                    }
+                    
+                    const deleteBtn = isAdmin ? 
+                        '<div class="delete-thought visible" onclick="deleteThought(' + thought.id + ')"><i class="fa fa-trash"></i> 删除</div>' : 
+                        '';
+                    
+                    $('#thoughts-list').append(`
+                        <div class="thought-item" data-id="${thought.id}">
+                            <div class="thought-header">
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">${thought.time}</div>
+                                </div>
+                            </div>
+                            <div class="thought-content">${thought.content}</div>
+                            ${imagesHtml}
+                            <div class="thought-actions">
+                                <div class="thought-action ${isAdmin ? '' : 'disabled'}" onclick="${isAdmin ? 'likeThought(' + thought.id + ')' : ''}">
+                                    <i class="fa fa-thumbs-up"></i> ${thought.likes}
+                                </div>
+                                <div class="thought-action disabled">
+                                    <i class="fa fa-comment"></i> ${thought.comments}
+                                </div>
+                                <div class="thought-action disabled">
+                                    <i class="fa fa-share"></i> 分享
+                                </div>
+                                ${deleteBtn}
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+            
+            // 允许Enter键发送（Ctrl+Enter换行）
+            $('#new-thought').keydown(function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    return; // 允许换行
+                }
+                if (e.key === 'Enter' && !e.ctrlKey) {
+                    e.preventDefault();
+                    $('#post-thought').click();
+                }
+            });
+            
+            // 初始化
+            updateStats();
+            loadThoughts();
+        });
+        
+        // 检查管理员状态
+        function checkAdminStatus() {
+            const adminStatus = localStorage.getItem('isAdmin');
+            if (adminStatus === 'true') {
+                const savedPassword = localStorage.getItem('adminPassword');
+                const defaultPassword = 'baive2023'; // 默认密码
+                const timestamp = localStorage.getItem('adminLoginTime');
+                const now = Date.now();
+                
+                // 检查是否在有效期内（24小时）
+                if (timestamp && (now - parseInt(timestamp)) < 24 * 60 * 60 * 1000) {
+                    isAdmin = true;
+                    enterAdminMode(savedPassword || defaultPassword);
+                    return;
+                } else {
+                    // 登录已过期
+                    localStorage.removeItem('isAdmin');
+                    localStorage.removeItem('adminLoginTime');
+                }
+            }
+            
+            // 显示登录框
+            setTimeout(() => {
+                document.getElementById('login-modal').style.display = 'flex';
+            }, 500);
+        }
+        
+        // 检查登录
+        function checkLogin() {
+            const password = document.getElementById('login-password').value;
+            const defaultPassword = 'baive2023'; // 默认密码
+            
+            if (password === defaultPassword) {
+                enterAdminMode(password);
+                document.getElementById('login-modal').style.display = 'none';
+            } else {
+                alert('密码错误！请使用默认密码：baive2023');
+            }
+        }
+        
+        // 进入管理员模式
+        function enterAdminMode(password) {
+            isAdmin = true;
+            
+            // 保存登录状态
+            localStorage.setItem('isAdmin', 'true');
+            localStorage.setItem('adminPassword', password);
+            localStorage.setItem('adminLoginTime', Date.now().toString());
+            
+            // 更新UI
+            document.getElementById('admin-indicator').style.display = 'block';
+            document.getElementById('current-mode').textContent = '主人';
+            
+            // 更新心情卡片
+            const moodContent = document.getElementById('mood-content');
+            moodContent.className = 'mood-content editable';
+            moodContent.contentEditable = true;
+            document.getElementById('mood-guest-hint').style.display = 'none';
+            
+            // 更新番茄钟
+            $('#start-btn, #reset-btn, #short-break, #long-break')
+                .removeClass('btn-disabled')
+                .addClass('btn-primary')
+                .prop('disabled', false);
+            $('#start-btn').addClass('btn-primary').removeClass('btn-disabled');
+            $('#reset-btn').addClass('btn-secondary').removeClass('btn-disabled');
+            $('#short-break, #long-break').addClass('btn-secondary').removeClass('btn-disabled');
+            $('#pomodoro-guest-hint').hide();
+            
+            // 更新想法卡片
+            document.getElementById('thought-input-container').style.display = 'flex';
+            document.getElementById('image-upload-btn').className = 'image-upload-btn';
+            $('#post-thought').removeClass('btn-disabled').addClass('btn-primary').prop('disabled', false);
+            document.getElementById('thought-guest-hint').style.display = 'none';
+            
+            // 隐藏访客登录提示
+            document.getElementById('login-hint').style.display = 'none';
+            
+            // 重新加载想法（显示删除按钮）
+            loadThoughts();
+            
+            // 加载番茄钟历史
+            updateHistoryList();
+            
+            alert('欢迎回来，主人！');
+        }
+        
+        // 进入访客模式
+        function enterGuestMode() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('current-mode').textContent = '访客';
+            document.getElementById('login-hint').style.display = 'block';
+            document.getElementById('mood-guest-hint').style.display = 'block';
+            document.getElementById('pomodoro-guest-hint').style.display = 'block';
+            document.getElementById('thought-guest-hint').style.display = 'block';
+            
+            alert('您正在以访客身份浏览。部分功能仅限主人使用。');
+        }
+        
+        // 显示登录框
+        function showLogin() {
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('isAdmin');
+            localStorage.removeItem('adminLoginTime');
+            location.reload();
+        }
+        
+        // 心情编辑相关函数
+        function saveMood() {
+            if (!isAdmin) return;
+            
+            const moodContent = document.getElementById('mood-content');
+            const mood = moodContent.innerText.trim();
+            
+            if (mood && mood !== '主人今天还没有分享心情...') {
+                localStorage.setItem('dailyMood', mood);
+                alert('心情保存成功！');
+                document.getElementById('mood-actions').style.display = 'none';
+            } else {
+                alert('心情内容不能为空！');
+            }
+        }
+        
+        function cancelEditMood() {
+            if (!isAdmin) return;
+            
+            const moodContent = document.getElementById('mood-content');
+            moodContent.innerText = originalMood || '主人今天还没有分享心情...';
+            document.getElementById('mood-actions').style.display = 'none';
+        }
+        
+        // 监听心情编辑
+        document.getElementById('mood-content').addEventListener('focus', function() {
+            if (!isAdmin) return;
+            
+            originalMood = this.innerText;
+            if (this.innerText === '主人今天还没有分享心情...') {
+                this.innerText = '';
+            }
+            document.getElementById('mood-actions').style.display = 'flex';
+        });
+        
+        // 图片上传处理
+        function handleImageUpload(event) {
+            if (!isAdmin) {
+                alert('请先登录主人模式！');
+                return;
+            }
+            
+            const files = event.target.files;
+            const previewContainer = document.getElementById('image-preview-container');
+            
+            // 清空预览容器
+            previewContainer.innerHTML = '';
+            
+            // 检查文件数量和大小
+            if (files.length > 5) {
+                alert('最多只能上传5张图片！');
+                event.target.value = '';
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // 检查文件大小（不超过5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`图片 ${file.name} 超过5MB限制！`);
+                    continue;
+                }
+                
+                // 检查文件类型
+                if (!file.type.match('image.*')) {
+                    alert(`文件 ${file.name} 不是图片格式！`);
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // 添加预览图片
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'image-preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" alt="预览图片">
+                        <div class="image-preview-remove" onclick="removeImage(this, '${e.target.result}')">×</div>
+                    `;
+                    previewContainer.appendChild(previewItem);
+                    
+                    // 保存图片数据
+                    uploadedImages.push(e.target.result);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // 重置文件输入，以便可以再次选择相同的文件
+            event.target.value = '';
+        }
+        
+        // 移除已上传图片
+        function removeImage(element, imageData) {
+            if (!isAdmin) return;
+            
+            const previewItem = element.parentElement;
+            previewItem.remove();
+            
+            // 从数组中移除图片数据
+            const index = uploadedImages.indexOf(imageData);
+            if (index > -1) {
+                uploadedImages.splice(index, 1);
+            }
+        }
+        
+        // 查看大图
+        function viewImage(imageSrc) {
+            document.getElementById('viewed-image').src = imageSrc;
+            document.getElementById('image-viewer').style.display = 'flex';
+        }
+        
+        // 关闭图片查看器
+        function closeImageViewer() {
+            document.getElementById('image-viewer').style.display = 'none';
+        }
+        
+        // 点赞想法（仅主人）
+        function likeThought(id) {
+            if (!isAdmin) return;
+            
+            let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+            const thoughtIndex = thoughts.findIndex(t => t.id === id);
+            if (thoughtIndex !== -1) {
+                thoughts[thoughtIndex].likes++;
+                localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                
+                // 更新显示
+                $(`[data-id="${id}"] .fa-thumbs-up`).parent().html(`<i class="fa fa-thumbs-up"></i> ${thoughts[thoughtIndex].likes}`);
+            }
+        }
+        
+        // 删除想法（仅主人）
+        function deleteThought(id) {
+            if (!isAdmin) return;
+            
+            if (confirm('确定要删除这条想法吗？')) {
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                thoughts = thoughts.filter(thought => thought.id !== id);
+                localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                
+                // 重新加载
+                $(`[data-id="${id}"]`).fadeOut(300, function() {
+                    $(this).remove();
+                });
+                
+                // 如果没有想法了，显示提示
+                if (thoughts.length === 0) {
+                    setTimeout(() => {
+                        $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
+                    }, 300);
+                }
+            }
+        }
+        
+        // 浏览器搞笑标题
+        var OriginTitle = document.title;
+        var titleTime;
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                document.title = '(>_<) 专注学习去了吗？';
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = '(*^▽^*) 欢迎回来！';
+                titleTime = setTimeout(function () {
+                    document.title = OriginTitle;
+                }, 2000);
+            }
+        });
+        
+        // 控制台欢迎信息
+        console.clear();
+        console.log("%c 欢迎来到百夜的学术二次元空间！", "background: linear-gradient(90deg, #6751b9, #8a74f9); color:white; padding:10px; border-radius:5px; font-weight:bold", "");
+        console.log("%c 这里融合了学术严谨与二次元趣味", "color: #a0aec0", "");
+        console.log("%c 当前模式: " + (isAdmin ? "主人模式" : "访客模式"), "background:#24272A; color:#ffffff; padding:3px 6px; border-radius:3px", "");
+        
+        // 自动填充密码（开发时方便）
+        document.getElementById('login-password').value = 'baive2023';
+    </script>
+</body>
+
+</html>
