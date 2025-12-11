@@ -262,6 +262,69 @@
             color: #a0aec0;
         }
         
+        /* 可编辑心情卡片 */
+        .mood-card {
+            position: relative;
+        }
+        
+        .mood-content {
+            min-height: 60px;
+            padding: 12px;
+            background: rgba(15, 20, 30, 0.6);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(103, 81, 185, 0.2);
+            cursor: text;
+            transition: all 0.3s;
+        }
+        
+        .mood-content:hover {
+            border-color: rgba(103, 81, 185, 0.5);
+        }
+        
+        .mood-content:focus {
+            outline: none;
+            border-color: #6751b9;
+            background: rgba(15, 20, 30, 0.8);
+        }
+        
+        .mood-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .mood-btn {
+            padding: 6px 15px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(103, 81, 185, 0.2);
+            color: #c3b5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .mood-btn:hover {
+            background: rgba(103, 81, 185, 0.4);
+            color: white;
+        }
+        
+        .mood-btn-primary {
+            background: linear-gradient(135deg, #6751b9, #8a74f9);
+            color: white;
+        }
+        
+        .mood-btn-primary:hover {
+            background: linear-gradient(135deg, #5a46a5, #7a65e0);
+        }
+        
+        .mood-placeholder {
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
         /* 番茄钟卡片 */
         .pomodoro-card {
             position: relative;
@@ -366,7 +429,7 @@
             font-size: 0.9rem;
         }
         
-        /* 想法卡片 - 知乎风格 */
+        /* 想法卡片 - 增强版 */
         .thoughts-card {
             padding-bottom: 10px;
         }
@@ -395,6 +458,81 @@
             border-color: #6751b9;
         }
         
+        /* 图片上传区域 */
+        .image-upload-container {
+            margin-top: 15px;
+            border: 2px dashed rgba(103, 81, 185, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-container:hover {
+            border-color: #6751b9;
+            background: rgba(103, 81, 185, 0.05);
+        }
+        
+        .image-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(103, 81, 185, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #c3b5f5;
+        }
+        
+        .image-upload-btn:hover {
+            background: rgba(103, 81, 185, 0.4);
+            color: white;
+        }
+        
+        .image-upload-input {
+            display: none;
+        }
+        
+        .image-preview-container {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid rgba(103, 81, 185, 0.3);
+        }
+        
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* 想法列表 */
         .thoughts-list {
             display: flex;
             flex-direction: column;
@@ -437,6 +575,36 @@
             color: #e8eaed;
             line-height: 1.7;
             margin-bottom: 15px;
+        }
+        
+        /* 想法图片展示 */
+        .thought-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .thought-image-item {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid rgba(103, 81, 185, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .thought-image-item:hover {
+            transform: scale(1.05);
+            border-color: #6751b9;
+        }
+        
+        .thought-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .thought-actions {
@@ -512,6 +680,11 @@
             #site-title {
                 font-size: 2.2rem;
             }
+            
+            .thought-image-item {
+                width: 100%;
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -561,15 +734,29 @@
                     </div>
                 </div>
 
-                <!-- 今日心情卡片 -->
-                <div class="card">
+                <!-- 可编辑心情卡片 -->
+                <div class="card mood-card">
                     <div class="card-header">
                         <div class="card-icon">
                             <i class="fa fa-heart"></i>
                         </div>
                         <h3 class="card-title">今日心情</h3>
                     </div>
-                    <div id="daily-mood">今日专注学习了5小时，完成了数学分析和前端项目，继续加油！</div>
+                    <div 
+                        class="mood-content" 
+                        id="mood-content" 
+                        contenteditable="true"
+                        data-placeholder="点击编辑今日心情..."
+                        onfocus="if(this.innerText === '点击编辑今日心情...') this.innerText = ''"
+                        onblur="if(this.innerText.trim() === '') this.innerText = '点击编辑今日心情...'"
+                    >今天专注学习了5小时，完成了数学分析和前端项目，继续加油！</div>
+                    <div class="mood-actions" id="mood-actions" style="display: none;">
+                        <button class="mood-btn" onclick="cancelEditMood()">取消</button>
+                        <button class="mood-btn mood-btn-primary" onclick="saveMood()">保存</button>
+                    </div>
+                    <div class="mood-info">
+                        <small style="color: #a0aec0; font-size: 0.8rem;">点击上方文本框编辑心情，支持换行和Emoji</small>
+                    </div>
                 </div>
 
                 <!-- 统计数据卡片 -->
@@ -653,7 +840,7 @@
                     </div>
                 </div>
 
-                <!-- 想法卡片 -->
+                <!-- 想法卡片（支持图片上传） -->
                 <div class="card thoughts-card">
                     <div class="card-header">
                         <div class="card-icon">
@@ -666,6 +853,22 @@
                         <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
                         <div style="flex: 1;">
                             <textarea class="thought-input" id="new-thought" placeholder="分享你的想法、学习心得或有趣发现..."></textarea>
+                            
+                            <!-- 图片上传区域 -->
+                            <div class="image-upload-container">
+                                <div class="image-upload-btn" onclick="document.getElementById('image-upload').click()">
+                                    <i class="fa fa-image"></i>
+                                    <span>添加图片</span>
+                                </div>
+                                <input type="file" id="image-upload" class="image-upload-input" accept="image/*" multiple onchange="handleImageUpload(event)">
+                                <p style="margin-top: 10px; color: #a0aec0; font-size: 0.9rem;">支持上传JPG、PNG格式，每张图片不超过5MB</p>
+                            </div>
+                            
+                            <!-- 图片预览区域 -->
+                            <div class="image-preview-container" id="image-preview-container">
+                                <!-- 预览图片将动态添加到这里 -->
+                            </div>
+                            
                             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
                                 <button class="btn btn-primary" id="post-thought">发布想法</button>
                             </div>
@@ -685,8 +888,14 @@
                             <div class="thought-content">
                                 今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！
                             </div>
+                            <div class="thought-images">
+                                <!-- 示例图片 -->
+                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop')">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop" alt="示例图片">
+                                </div>
+                            </div>
                             <div class="thought-actions">
-                                <div class="thought-action">
+                                <div class="thought-action" onclick="likeThought(1)">
                                     <i class="fa fa-thumbs-up"></i> 12
                                 </div>
                                 <div class="thought-action">
@@ -709,8 +918,14 @@
                             <div class="thought-content">
                                 最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。
                             </div>
+                            <div class="thought-images">
+                                <!-- 示例图片 -->
+                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w-400&auto=format&fit=crop')">
+                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop" alt="示例图片">
+                                </div>
+                            </div>
                             <div class="thought-actions">
-                                <div class="thought-action">
+                                <div class="thought-action" onclick="likeThought(2)">
                                     <i class="fa fa-thumbs-up"></i> 24
                                 </div>
                                 <div class="thought-action">
@@ -731,6 +946,14 @@
                 <div class="copyright">&copy; 2023 百夜 | 中山大学数学系 | All shall be well, and all shall be well, and all manner of things shall be well.</div>
             </div>
         </footer>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <div id="image-viewer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="position: relative; max-width: 90%; max-height: 90%;">
+            <img id="viewed-image" src="" alt="" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
+            <button onclick="closeImageViewer()" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">×</button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
@@ -775,6 +998,31 @@
                 mini: false,
                 autoplay: false,
                 theme: '#6751b9'
+            });
+            
+            // 可编辑心情功能
+            let originalMood = '';
+            const moodContent = document.getElementById('mood-content');
+            const moodActions = document.getElementById('mood-actions');
+            
+            // 加载保存的心情
+            const savedMood = localStorage.getItem('dailyMood');
+            if (savedMood) {
+                moodContent.innerText = savedMood;
+            }
+            
+            // 监听心情编辑
+            moodContent.addEventListener('focus', function() {
+                originalMood = this.innerText;
+                if (this.innerText === '点击编辑今日心情...') {
+                    this.innerText = '';
+                }
+                moodActions.style.display = 'flex';
+            });
+            
+            moodContent.addEventListener('input', function() {
+                // 实时保存草稿
+                localStorage.setItem('moodDraft', this.innerText);
             });
             
             // 番茄钟功能
@@ -998,22 +1246,30 @@
             $('#short-break').click(() => startBreak(5));
             $('#long-break').click(() => startBreak(15));
             
-            // 说说功能
+            // 图片上传相关变量
+            let uploadedImages = [];
+            
+            // 说说功能 - 支持图片上传
             $('#post-thought').click(function() {
                 const thought = $('#new-thought').val().trim();
-                if (thought) {
-                    saveThought(thought);
+                if (thought || uploadedImages.length > 0) {
+                    saveThought(thought, uploadedImages);
                     $('#new-thought').val('');
+                    uploadedImages = [];
+                    $('#image-preview-container').empty();
+                } else {
+                    alert('请输入想法或上传图片！');
                 }
             });
             
-            function saveThought(content) {
+            function saveThought(content, images) {
                 const thought = {
                     id: Date.now(),
                     content: content,
                     time: new Date().toLocaleString('zh-CN'),
                     likes: 0,
-                    comments: 0
+                    comments: 0,
+                    images: images // 保存图片数据
                 };
                 
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
@@ -1035,20 +1291,35 @@
                             content: '今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！',
                             time: '2小时前',
                             likes: 12,
-                            comments: 5
+                            comments: 5,
+                            images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop']
                         },
                         {
                             id: 2,
                             content: '最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。',
                             time: '昨天',
                             likes: 24,
-                            comments: 8
+                            comments: 8,
+                            images: ['https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop']
                         }
                     ];
                     localStorage.setItem('thoughts', JSON.stringify(thoughts));
                 }
                 
                 thoughts.forEach(thought => {
+                    let imagesHtml = '';
+                    if (thought.images && thought.images.length > 0) {
+                        imagesHtml = '<div class="thought-images">';
+                        thought.images.forEach((img, index) => {
+                            imagesHtml += `
+                                <div class="thought-image-item" onclick="viewImage('${img}')">
+                                    <img src="${img}" alt="图片${index + 1}">
+                                </div>
+                            `;
+                        });
+                        imagesHtml += '</div>';
+                    }
+                    
                     $('#thoughts-list').append(`
                         <div class="thought-item" data-id="${thought.id}">
                             <div class="thought-header">
@@ -1059,6 +1330,7 @@
                                 </div>
                             </div>
                             <div class="thought-content">${thought.content}</div>
+                            ${imagesHtml}
                             <div class="thought-actions">
                                 <div class="thought-action" onclick="likeThought(${thought.id})">
                                     <i class="fa fa-thumbs-up"></i> ${thought.likes}
@@ -1089,12 +1361,118 @@
                 }
             });
             
+            // 加载草稿
+            const moodDraft = localStorage.getItem('moodDraft');
+            if (moodDraft && moodDraft !== '点击编辑今日心情...') {
+                moodContent.innerText = moodDraft;
+            }
+            
             // 初始化
             updateStats();
             loadThoughts();
         });
         
         // 全局函数
+        
+        // 心情编辑相关函数
+        function saveMood() {
+            const moodContent = document.getElementById('mood-content');
+            const mood = moodContent.innerText.trim();
+            
+            if (mood && mood !== '点击编辑今日心情...') {
+                localStorage.setItem('dailyMood', mood);
+                localStorage.removeItem('moodDraft'); // 清除草稿
+                alert('心情保存成功！');
+                moodActions.style.display = 'none';
+            } else {
+                alert('心情内容不能为空！');
+            }
+        }
+        
+        function cancelEditMood() {
+            const moodContent = document.getElementById('mood-content');
+            moodContent.innerText = originalMood || '点击编辑今日心情...';
+            moodActions.style.display = 'none';
+            localStorage.removeItem('moodDraft'); // 清除草稿
+        }
+        
+        // 图片上传处理
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('image-preview-container');
+            
+            // 清空预览容器
+            previewContainer.innerHTML = '';
+            
+            // 检查文件数量和大小
+            if (files.length > 5) {
+                alert('最多只能上传5张图片！');
+                event.target.value = '';
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // 检查文件大小（不超过5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`图片 ${file.name} 超过5MB限制！`);
+                    continue;
+                }
+                
+                // 检查文件类型
+                if (!file.type.match('image.*')) {
+                    alert(`文件 ${file.name} 不是图片格式！`);
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // 添加预览图片
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'image-preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" alt="预览图片">
+                        <div class="image-preview-remove" onclick="removeImage(this, '${e.target.result}')">×</div>
+                    `;
+                    previewContainer.appendChild(previewItem);
+                    
+                    // 保存图片数据
+                    uploadedImages.push(e.target.result);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // 重置文件输入，以便可以再次选择相同的文件
+            event.target.value = '';
+        }
+        
+        // 移除已上传图片
+        function removeImage(element, imageData) {
+            const previewItem = element.parentElement;
+            previewItem.remove();
+            
+            // 从数组中移除图片数据
+            const index = uploadedImages.indexOf(imageData);
+            if (index > -1) {
+                uploadedImages.splice(index, 1);
+            }
+        }
+        
+        // 查看大图
+        function viewImage(imageSrc) {
+            document.getElementById('viewed-image').src = imageSrc;
+            document.getElementById('image-viewer').style.display = 'flex';
+        }
+        
+        // 关闭图片查看器
+        function closeImageViewer() {
+            document.getElementById('image-viewer').style.display = 'none';
+        }
+        
+        // 点赞想法
         function likeThought(id) {
             let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
             const thoughtIndex = thoughts.findIndex(t => t.id === id);
@@ -1107,6 +1485,7 @@
             }
         }
         
+        // 删除想法
         function deleteThought(id) {
             if (confirm('确定要删除这条想法吗？')) {
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
@@ -1148,6 +1527,22 @@
         console.log("%c 欢迎来到百夜的学术二次元空间！", "background: linear-gradient(90deg, #6751b9, #8a74f9); color:white; padding:10px; border-radius:5px; font-weight:bold", "");
         console.log("%c 这里融合了学术严谨与二次元趣味", "color: #a0aec0", "");
         console.log("%c GitHub %c https://github.com", "background:#24272A; color:#ffffff; padding:3px 6px; border-radius:3px", "", "color: #60a5fa");
+        
+        // 点击图片上传区域外部时关闭心情编辑
+        document.addEventListener('click', function(event) {
+            const moodContent = document.getElementById('mood-content');
+            const moodActions = document.getElementById('mood-actions');
+            
+            if (!moodContent.contains(event.target) && !moodActions.contains(event.target)) {
+                if (moodActions.style.display === 'flex') {
+                    const currentMood = moodContent.innerText.trim();
+                    if (currentMood === '' || currentMood === '点击编辑今日心情...') {
+                        moodContent.innerText = originalMood || '点击编辑今日心情...';
+                    }
+                    moodActions.style.display = 'none';
+                }
+            }
+        });
     </script>
 </body>
 
