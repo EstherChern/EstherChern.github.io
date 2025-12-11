@@ -5,371 +5,778 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
-    <title>百夜</title>
-    <meta name="description" content="二次元,知乎用户,SYSU数学系大三在读">
-    <meta name="keywords" content="个人博客,开发者">
+    <title>百夜 | 学术与二次元</title>
+    <meta name="description" content="SYSU数学系大三在读，二次元爱好者，技术博客">
+    <meta name="keywords" content="个人博客,开发者,数学,编程,二次元">
     <meta name="format-detection" content="telephone=no">
     <link rel="shortcut icon" href="favicon.ico">
-    <link rel="stylesheet" href="static/css/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
     <style>
-        .anime-section {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: 2px solid #ff7eb3;
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #0f1419;
+            color: #e8eaed;
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(rgba(15, 20, 25, 0.9), rgba(15, 20, 25, 0.95)),
+                url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=2093&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
             position: relative;
         }
         
-        .anime-section::before {
+        /* 鲁路修主题背景 */
+        body::before {
             content: '';
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff7eb3" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>');
-            background-size: contain;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352614.png');
+            background-size: 400px;
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            opacity: 0.05;
+            z-index: -1;
         }
         
-        .pomodoro-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+        #body-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
-        .pomodoro-display {
-            font-size: 4em;
-            font-family: 'Digital', monospace;
-            color: #ff4081;
-            text-shadow: 0 0 10px rgba(255, 64, 129, 0.5);
-            margin: 20px 0;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 10px 30px;
-            border-radius: 10px;
-            border: 3px dashed #ff4081;
-        }
-        
-        .pomodoro-controls {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .anime-btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, #ff4081, #ff7eb3);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.3);
+        /* 导航栏 */
+        nav {
+            padding: 40px 0 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(103, 81, 185, 0.3);
+            margin-bottom: 30px;
             position: relative;
+        }
+        
+        nav::after {
+            content: 'CODE GEASS';
+            position: absolute;
+            bottom: -12px;
+            right: 20px;
+            font-size: 12px;
+            color: #6751b9;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        
+        #site-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(103, 81, 185, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        #site-title .blogtitle::after {
+            content: '|';
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* 主要内容布局 */
+        .layout_container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* 侧边栏 - 个人资料卡片 */
+        .aside_content {
+            flex: 0 0 300px;
+        }
+        
+        /* 主内容区 */
+        .main_content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        /* 卡片通用样式 */
+        .card {
+            background: rgba(25, 30, 40, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(103, 81, 185, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(103, 81, 185, 0.3);
+        }
+        
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #6751b9, #8a74f9);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        /* 个人资料卡片 */
+        .profile-card {
+            text-align: center;
             overflow: hidden;
         }
         
-        .anime-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(255, 64, 129, 0.4);
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(103, 81, 185, 0.7);
+            margin: 0 auto 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(103, 81, 185, 0.4);
         }
         
-        .anime-btn:active {
-            transform: translateY(1px);
-        }
-        
-        .pomodoro-history {
+        .profile-avatar img {
             width: 100%;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            border-top: 2px dashed #ff7eb3;
-            padding-top: 15px;
+            height: 100%;
+            object-fit: cover;
         }
         
-        .history-item {
-            padding: 8px 12px;
-            margin: 5px 0;
-            background: rgba(255, 126, 179, 0.1);
-            border-radius: 8px;
-            border-left: 4px solid #ff4081;
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
         }
         
-        .thoughts-container {
+        .profile-bio {
+            color: #a0aec0;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .profile-tags {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .tag {
+            background: rgba(103, 81, 185, 0.2);
+            border: 1px solid rgba(103, 81, 185, 0.4);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            color: #c3b5f5;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
             gap: 15px;
         }
         
-        .thoughts-input {
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+            color: #c3b5f5;
+            transition: all 0.3s;
+            text-decoration: none;
         }
         
-        .thoughts-input textarea {
+        .social-link:hover {
+            background: #6751b9;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        /* 统计数据卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(15, 20, 30, 0.6);
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8a74f9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+        
+        /* 番茄钟卡片 */
+        .pomodoro-card {
+            position: relative;
+        }
+        
+        .pomodoro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .pomodoro-timer {
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .timer-display {
+            font-family: 'Courier New', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(103, 81, 185, 0.7);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .timer-status {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6751b9, #8a74f9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a46a5, #7a65e0);
+            box-shadow: 0 5px 15px rgba(103, 81, 185, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8eaed;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(103, 81, 185, 0.5);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+        
+        .pomodoro-history {
+            border-top: 1px solid rgba(103, 81, 185, 0.2);
+            padding-top: 20px;
+        }
+        
+        .history-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: rgba(15, 20, 30, 0.6);
+            border-radius: 6px;
+            border-left: 3px solid #6751b9;
+            font-size: 0.9rem;
+        }
+        
+        /* 想法卡片 - 知乎风格 */
+        .thoughts-card {
+            padding-bottom: 10px;
+        }
+        
+        .thought-input-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .thought-input {
             flex: 1;
+            background: rgba(15, 20, 30, 0.6);
+            border: 1px solid rgba(103, 81, 185, 0.3);
+            border-radius: 10px;
             padding: 15px;
-            border: 2px solid #ff7eb3;
-            border-radius: 15px;
-            resize: vertical;
-            min-height: 80px;
+            color: #e8eaed;
             font-family: inherit;
-            background: rgba(255, 255, 255, 0.95);
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .thought-input:focus {
+            outline: none;
+            border-color: #6751b9;
         }
         
         .thoughts-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
         
         .thought-item {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ffccd5;
-            position: relative;
-        }
-        
-        .thought-item::before {
-            content: '✦';
-            position: absolute;
-            left: -25px;
-            top: 15px;
-            color: #ff4081;
-            font-size: 20px;
+            background: rgba(25, 30, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .thought-header {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #ffccd5;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .thought-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            border: 2px solid rgba(103, 81, 185, 0.5);
+        }
+        
+        .thought-author {
+            font-weight: 600;
+            color: #fff;
         }
         
         .thought-time {
-            color: #666;
-            font-size: 0.9em;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+        
+        .thought-content {
+            color: #e8eaed;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+        
+        .thought-actions {
+            display: flex;
+            gap: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+        
+        .thought-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .thought-action:hover {
+            color: #8a74f9;
         }
         
         .delete-thought {
-            color: #ff4081;
+            margin-left: auto;
+            color: #e53e3e;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.9rem;
         }
         
-        .anime-title {
-            color: #ff4081;
-            border-bottom: 3px solid #ff7eb3;
-            padding-bottom: 5px;
-            display: inline-block;
-            margin-bottom: 20px;
+        /* 音乐播放器 */
+        .music-card {
+            margin-bottom: 30px;
         }
         
-        .character-float {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            width: 120px;
-            opacity: 0.8;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(255, 126, 179, 0.1);
-            border-radius: 15px;
-        }
-        
-        .stat-item {
+        /* 页脚 */
+        footer {
             text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(103, 81, 185, 0.3);
+            color: #a0aec0;
+            font-size: 0.9rem;
         }
         
-        .stat-value {
-            font-size: 2em;
-            color: #ff4081;
-            font-weight: bold;
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .layout_container {
+                flex-direction: column;
+            }
+            
+            .aside_content {
+                flex: 1;
+            }
+            
+            .timer-display {
+                font-size: 4rem;
+            }
         }
         
-        .stat-label {
-            font-size: 0.9em;
-            color: #666;
+        @media (max-width: 600px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timer-display {
+                font-size: 3.5rem;
+            }
+            
+            #site-title {
+                font-size: 2.2rem;
+            }
         }
     </style>
-    <script type="text/javascript">
-        if (!!window.ActiveXObject || "ActiveXObject" in window) {
-            alert('朋友，上古浏览器不支持呢~');
-        }
-    </script>
 </head>
 
 <body>
     <div id="body-wrap">
-        <nav class="not_index_bg" id="nav" style="background-image:url(https://api.ixiaowai.cn/api/api.php)">
-            <div id="page_site-info">
-                <div id="site-title">
-                    <span class="blogtitle"></span>
-                    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
-                    <script>
-                        var typed = new Typed(".blogtitle", {
-                            strings: ['二次元的世界，无限可能', 'Welcome to Anime World'],
-                            startDelay: 300,
-                            typeSpeed: 100,
-                            loop: true,
-                            backSpeed: 50,
-                            showCursor: true
-                        });
-                    </script>
-                </div>
+        <!-- 导航栏 -->
+        <nav>
+            <div id="site-title">
+                <span class="blogtitle">百夜 | 学术与二次元</span>
             </div>
         </nav>
-        <main id="content-outer">
-            <div class="layout_page" id="content-inner">
-                <div class="aside_content" id="aside_content">
-                    <div class="card-widget card-info">
-                        <div class="card-content">
-                            <div class="card-info-avatar is-center">
-                                <img class="avatar-img"
-                                    src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg"
-                                    alt="avatar">
-                                <div class="author-info__name">摸鱼爱好者</div>
-                                <div class="author-info__description">学生<br>永远保持求知欲</div>
+
+        <!-- 主要内容区域 -->
+        <div class="layout_container">
+            <!-- 侧边栏：个人资料卡片 -->
+            <div class="aside_content">
+                <!-- 个人资料卡片 -->
+                <div class="card profile-card">
+                    <div class="profile-avatar">
+                        <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" alt="头像">
+                    </div>
+                    <h2 class="profile-name">摸鱼爱好者</h2>
+                    <p class="profile-bio">SYSU数学系大三在读<br>二次元爱好者 | 前端开发者<br>永远保持求知欲</p>
+                    
+                    <div class="profile-tags">
+                        <span class="tag">数学</span>
+                        <span class="tag">编程</span>
+                        <span class="tag">二次元</span>
+                        <span class="tag">动漫</span>
+                        <span class="tag">游戏</span>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="https://github.com" class="social-link" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fa fa-bilibili"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fa fa-zhihu"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 今日心情卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fa fa-heart"></i>
+                        </div>
+                        <h3 class="card-title">今日心情</h3>
+                    </div>
+                    <div id="daily-mood">今日专注学习了5小时，完成了数学分析和前端项目，继续加油！</div>
+                </div>
+
+                <!-- 统计数据卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fa fa-bar-chart"></i>
+                        </div>
+                        <h3 class="card-title">学习数据</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="focus-today">5.2h</div>
+                            <div class="stat-label">今日专注</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-pomodoro">127</div>
+                            <div class="stat-label">累计番茄</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="current-streak">18</div>
+                            <div class="stat-label">连续天数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主内容区域 -->
+            <div class="main_content">
+                <!-- 音乐播放器卡片 -->
+                <div class="card music-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fa fa-music"></i>
+                        </div>
+                        <h3 class="card-title">学习音乐</h3>
+                    </div>
+                    <div id="aplayer"></div>
+                </div>
+
+                <!-- 番茄钟卡片 -->
+                <div class="card pomodoro-card">
+                    <div class="pomodoro-header">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fa fa-clock-o"></i>
                             </div>
-                            <div class="card-info-social-icons is-center">
-                                <a class="social-icon" href="https://github.com" target="_blank">
-                                    <i class="fa fa-github"></i>
-                                </a>
-                                <a class="social-icon" href="#" target="_blank">
-                                    <i class="fa fa-weibo"></i>
-                                </a>
-                                <a class="social-icon" href="#" target="_blank">
-                                    <i class="fa fa-bilibili"></i>
-                                </a>
+                            <h3 class="card-title">学术番茄钟</h3>
+                        </div>
+                        <div class="timer-status" id="timer-status">准备开始</div>
+                    </div>
+                    
+                    <div class="pomodoro-timer">
+                        <div class="timer-display" id="timer-display">25:00</div>
+                    </div>
+                    
+                    <div class="controls-grid">
+                        <button class="btn btn-primary" id="start-btn">
+                            <i class="fa fa-play"></i> 开始专注
+                        </button>
+                        <button class="btn btn-secondary" id="pause-btn" style="display:none">
+                            <i class="fa fa-pause"></i> 暂停
+                        </button>
+                        <button class="btn btn-secondary" id="reset-btn">
+                            <i class="fa fa-refresh"></i> 重置
+                        </button>
+                        <button class="btn btn-secondary btn-small" id="short-break">
+                            <i class="fa fa-coffee"></i> 短休息
+                        </button>
+                        <button class="btn btn-secondary btn-small" id="long-break">
+                            <i class="fa fa-bed"></i> 长休息
+                        </button>
+                    </div>
+                    
+                    <div class="pomodoro-history">
+                        <h4 class="history-title">今日专注记录</h4>
+                        <div class="history-list" id="history-list">
+                            <!-- 历史记录将在这里动态生成 -->
+                            <div class="history-item">今天还没有记录，开始第一个番茄钟吧！</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 想法卡片 -->
+                <div class="card thoughts-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fa fa-pencil"></i>
+                        </div>
+                        <h3 class="card-title">今日想法</h3>
+                    </div>
+                    
+                    <div class="thought-input-container">
+                        <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                        <div style="flex: 1;">
+                            <textarea class="thought-input" id="new-thought" placeholder="分享你的想法、学习心得或有趣发现..."></textarea>
+                            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                <button class="btn btn-primary" id="post-thought">发布想法</button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card-widget card-announcement">
-                        <div class="card-content">
-                            <div class="item-headline">
-                                <i class="fa fa-heart" aria-hidden="true"></i>
-                                <span>今日心情</span>
-                            </div>
-                            <div id="daily-mood">今天也是元气满满的一天呢！(๑•̀ㅂ•́)و✧</div>
-                        </div>
-                    </div>
-
-                    <div class="card-widget card-webinfo">
-                        <div class="card-content">
-                            <div class="item-headline">
-                                <i class="fa fa-line-chart" aria-hidden="true"></i>
-                                <span>次元数据</span>
-                            </div>
-                            <div class="webinfo">
-                                <div class="webinfo-item">
-                                    <div class="webinfo-site-uv-name">本日专注时长 :</div>
-                                    <div class="webinfo-site-uv-count" id="focus-today">0 分钟</div>
+                    
+                    <div class="thoughts-list" id="thoughts-list">
+                        <!-- 想法列表将在这里动态生成 -->
+                        <div class="thought-item">
+                            <div class="thought-header">
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">2小时前</div>
                                 </div>
-                                <div class="webinfo-item">
-                                    <div class="webinfo-site-name">累计番茄钟 :</div>
-                                    <div class="webinfo-site-pv-count" id="total-pomodoro">0 个</div>
+                            </div>
+                            <div class="thought-content">
+                                今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！
+                            </div>
+                            <div class="thought-actions">
+                                <div class="thought-action">
+                                    <i class="fa fa-thumbs-up"></i> 12
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-comment"></i> 5
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-share"></i> 分享
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="thought-item">
+                            <div class="thought-header">
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">昨天</div>
+                                </div>
+                            </div>
+                            <div class="thought-content">
+                                最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。
+                            </div>
+                            <div class="thought-actions">
+                                <div class="thought-action">
+                                    <i class="fa fa-thumbs-up"></i> 24
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-comment"></i> 8
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-share"></i> 分享
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <article id="page">
-                    <div class="article-container">
-                        <h2>音乐</h2>
-                        <meting-js auto="https://y.qq.com/n/yqq/playlist/7713574197.html">
-                        </meting-js>
-                        <hr>
-
-                        <!-- 番茄钟模块 -->
-                        <div class="anime-section">
-                            <h2 class="anime-title">✧ 二次元番茄钟 ✧</h2>
-                            <div class="pomodoro-container">
-                                <div class="stats">
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="completed-today">0</div>
-                                        <div class="stat-label">今日完成</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="total-focus">0</div>
-                                        <div class="stat-label">总专注时长(分钟)</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="current-streak">0</div>
-                                        <div class="stat-label">连续天数</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="pomodoro-display" id="timer-display">25:00</div>
-                                
-                                <div class="pomodoro-controls">
-                                    <button class="anime-btn" id="start-btn">开始专注</button>
-                                    <button class="anime-btn" id="pause-btn" style="display:none">暂停</button>
-                                    <button class="anime-btn" id="reset-btn">重置</button>
-                                    <button class="anime-btn" id="short-break">短休息(5分)</button>
-                                    <button class="anime-btn" id="long-break">长休息(15分)</button>
-                                </div>
-                                
-                                <div class="pomodoro-history">
-                                    <h4>⌛ 今日记录</h4>
-                                    <div id="history-list"></div>
-                                </div>
-                            </div>
-                            <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352614.png" 
-                                 class="character-float" alt="二次元角色">
-                        </div>
-
-                        <!-- 说说模块 -->
-                        <div class="anime-section">
-                            <h2 class="anime-title">✦ 今日想法 ✦</h2>
-                            <div class="thoughts-container">
-                                <div class="thoughts-input">
-                                    <textarea id="new-thought" placeholder="分享你的想法... (๑>ᴗ<๑)"></textarea>
-                                    <button class="anime-btn" id="post-thought">发布</button>
-                                </div>
-                                
-                                <div class="thoughts-list" id="thoughts-list">
-                                    <!-- 想法会动态加载到这里 -->
-                                </div>
-                            </div>
-                        </div>
-
-                </article>
             </div>
-        </main>
-        <footer id="footer">
+        </div>
+
+        <footer>
             <div id="footer-wrap">
-                <div class="copyright">&copy;</div>
+                <div class="copyright">&copy; 2023 百夜 | 中山大学数学系 | All shall be well, and all shall be well, and all manner of things shall be well.</div>
             </div>
         </footer>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/instant.page@3.0.0/instantpage.js" type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js" async></script>
-  
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
     <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
-
-
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+    
     <script>
         $(document).ready(function() {
+            // 初始化动态标题
+            var typed = new Typed(".blogtitle", {
+                strings: ['百夜 | 学术与二次元', '百夜 | 数学与编程', '百夜 | 专注与创造'],
+                startDelay: 300,
+                typeSpeed: 100,
+                loop: true,
+                backSpeed: 50,
+                showCursor: true
+            });
+            
+            // 初始化音乐播放器
+            const ap = new APlayer({
+                container: document.getElementById('aplayer'),
+                audio: [{
+                    name: '学习专注音乐',
+                    artist: '纯音乐',
+                    url: 'https://music.163.com/song/media/outer/url?id=1859245776.mp3',
+                    cover: 'https://p2.music.126.net/y-pQkLXU4Z5aXkQzSDSjag==/109951166118847666.jpg'
+                }, {
+                    name: '宁静钢琴曲',
+                    artist: '钢琴曲',
+                    url: 'https://music.163.com/song/media/outer/url?id=1392997646.mp3',
+                    cover: 'https://p1.music.126.net/5J1ZvhykLQxqKp5Wv-3X0w==/109951164119981465.jpg'
+                }, {
+                    name: '白噪音 - 雨声',
+                    artist: '自然声音',
+                    url: 'https://music.163.com/song/media/outer/url?id=1463165983.mp3',
+                    cover: 'https://p1.music.126.net/MJ8Nw-kr3wT9PEO8Dnl_qw==/109951164215003212.jpg'
+                }],
+                volume: 0.7,
+                fixed: false,
+                mini: false,
+                autoplay: false,
+                theme: '#6751b9'
+            });
+            
             // 番茄钟功能
             let timer;
             let minutes = 25;
@@ -377,7 +784,7 @@
             let isRunning = false;
             let isBreak = false;
             let completedCount = 0;
-            let totalFocusTime = 0;
+            let totalFocusTime = 300; // 5小时，单位：分钟
             let today = new Date().toDateString();
             
             // 加载存储的数据
@@ -394,6 +801,8 @@
                     timer = setInterval(updateTimer, 1000);
                     $('#start-btn').hide();
                     $('#pause-btn').show();
+                    $('#timer-status').text('专注中...');
+                    document.title = `专注中 - ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 百夜`;
                 }
             }
             
@@ -402,6 +811,8 @@
                 clearInterval(timer);
                 $('#start-btn').show();
                 $('#pause-btn').hide();
+                $('#timer-status').text('已暂停');
+                document.title = `已暂停 - ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 百夜`;
             }
             
             function resetTimer() {
@@ -409,6 +820,8 @@
                 minutes = isBreak ? 5 : 25;
                 seconds = 0;
                 updateDisplay();
+                $('#timer-status').text('准备开始');
+                document.title = '百夜 | 学术与二次元';
             }
             
             function updateTimer() {
@@ -424,11 +837,29 @@
                             totalFocusTime += 25;
                             savePomodoroRecord();
                             updateStats();
-                            alert('🍅 恭喜完成一个番茄钟！休息一下吧～');
+                            
+                            // 播放提示音
+                            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+                            audio.volume = 0.3;
+                            audio.play();
+                            
+                            // 显示通知
+                            if (Notification.permission === 'granted') {
+                                new Notification('番茄钟完成', {
+                                    body: '恭喜完成一个番茄钟！休息一下吧～',
+                                    icon: 'https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg'
+                                });
+                            }
+                            
+                            $('#timer-status').html('<span style="color:#4ade80;">🍅 番茄钟完成！</span>');
                             startBreak(5);
                         } else {
                             // 休息结束
-                            alert('休息结束，继续加油吧！(๑•̀ㅂ•́)و✧');
+                            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3');
+                            audio.volume = 0.3;
+                            audio.play();
+                            
+                            $('#timer-status').html('<span style="color:#60a5fa;">休息结束，继续专注吧！</span>');
                             isBreak = false;
                             minutes = 25;
                             seconds = 0;
@@ -450,9 +881,11 @@
                 const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 $('#timer-display').text(display);
                 
-                // 更新标题显示
-                const prefix = isBreak ? '休息中 - ' : '专注中 - ';
-                document.title = prefix + display;
+                // 动态更新标题
+                if (isRunning) {
+                    const prefix = isBreak ? '休息中 - ' : '专注中 - ';
+                    document.title = prefix + display + ' | 百夜';
+                }
             }
             
             function startBreak(minutesBreak) {
@@ -461,19 +894,19 @@
                 seconds = 0;
                 isRunning = false;
                 updateDisplay();
-                alert(`开始${minutesBreak}分钟休息～`);
+                $('#timer-status').html(`<span style="color:#fbbf24;">休息中 - ${minutesBreak}分钟</span>`);
             }
             
             function savePomodoroRecord() {
                 const record = {
-                    time: new Date().toLocaleString(),
+                    time: new Date().toLocaleString('zh-CN'),
                     type: 'pomodoro',
                     duration: 25
                 };
                 
                 let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
                 history.push(record);
-                localStorage.setItem('pomodoroHistory', JSON.stringify(history));
+                localStorage.setItem('pomodoroHistory', JSON.stringify(history.slice(-20))); // 只保留最近20条
                 
                 // 更新今日数据
                 const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
@@ -499,21 +932,25 @@
             
             function updateHistoryList() {
                 let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
-                const todayHistory = history.filter(record => 
-                    new Date(record.time).toDateString() === today
-                );
-                
-                $('#history-list').empty();
-                todayHistory.slice(-5).forEach(record => {
-                    $('#history-list').prepend(
-                        `<div class="history-item">
-                            🍅 ${record.time.split(' ')[1]} - 完成25分钟专注
-                        </div>`
-                    );
+                const todayHistory = history.filter(record => {
+                    const recordDate = new Date(record.time).toDateString();
+                    return recordDate === today;
                 });
                 
+                $('#history-list').empty();
+                
                 if (todayHistory.length === 0) {
-                    $('#history-list').html('<div class="history-item">今天还没有记录呢，开始第一个番茄钟吧！</div>');
+                    $('#history-list').append('<div class="history-item">今天还没有记录，开始第一个番茄钟吧！</div>');
+                } else {
+                    todayHistory.slice(-5).reverse().forEach(record => {
+                        const time = record.time.split(' ')[1].substring(0, 5);
+                        $('#history-list').append(
+                            `<div class="history-item">
+                                <i class="fa fa-check-circle" style="color:#4ade80; margin-right:8px;"></i>
+                                ${time} - 完成25分钟专注
+                            </div>`
+                        );
+                    });
                 }
             }
             
@@ -521,10 +958,14 @@
                 const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
                 const history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
                 
-                $('#completed-today').text(todayData.completed || 0);
-                $('#total-focus').text(todayData.focusTime || 0);
-                $('#total-pomodoro').text(history.length + ' 个');
-                $('#focus-today').text((todayData.focusTime || 0) + ' 分钟');
+                // 计算今日专注时间
+                const todayFocus = todayData.focusTime || 0;
+                const todayHours = Math.floor(todayFocus / 60);
+                const todayMinutes = todayFocus % 60;
+                $('#focus-today').text(`${todayHours > 0 ? todayHours + 'h' : ''}${todayMinutes}m`);
+                
+                // 更新累计番茄钟
+                $('#total-pomodoro').text(history.length);
                 
                 // 计算连续天数
                 let dates = [...new Set(history.map(r => new Date(r.time).toDateString()))];
@@ -541,6 +982,13 @@
                     }
                 }
                 $('#current-streak').text(streak);
+            }
+            
+            // 请求通知权限
+            if ('Notification' in window && Notification.permission === 'default') {
+                setTimeout(() => {
+                    Notification.requestPermission();
+                }, 2000);
             }
             
             // 事件监听
@@ -563,13 +1011,14 @@
                 const thought = {
                     id: Date.now(),
                     content: content,
-                    time: new Date().toLocaleString(),
-                    likes: 0
+                    time: new Date().toLocaleString('zh-CN'),
+                    likes: 0,
+                    comments: 0
                 };
                 
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
                 thoughts.unshift(thought);
-                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 50))); // 最多保存50条
+                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 20))); // 最多保存20条
                 
                 loadThoughts();
             }
@@ -578,21 +1027,55 @@
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
                 $('#thoughts-list').empty();
                 
+                if (thoughts.length === 0) {
+                    // 使用示例想法
+                    thoughts = [
+                        {
+                            id: 1,
+                            content: '今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！',
+                            time: '2小时前',
+                            likes: 12,
+                            comments: 5
+                        },
+                        {
+                            id: 2,
+                            content: '最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。',
+                            time: '昨天',
+                            likes: 24,
+                            comments: 8
+                        }
+                    ];
+                    localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                }
+                
                 thoughts.forEach(thought => {
                     $('#thoughts-list').append(`
                         <div class="thought-item" data-id="${thought.id}">
                             <div class="thought-header">
-                                <span class="thought-time">${thought.time}</span>
-                                <span class="delete-thought" onclick="deleteThought(${thought.id})">删除</span>
+                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                                <div>
+                                    <div class="thought-author">摸鱼爱好者</div>
+                                    <div class="thought-time">${thought.time}</div>
+                                </div>
                             </div>
                             <div class="thought-content">${thought.content}</div>
+                            <div class="thought-actions">
+                                <div class="thought-action" onclick="likeThought(${thought.id})">
+                                    <i class="fa fa-thumbs-up"></i> ${thought.likes}
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-comment"></i> ${thought.comments}
+                                </div>
+                                <div class="thought-action">
+                                    <i class="fa fa-share"></i> 分享
+                                </div>
+                                <div class="delete-thought" onclick="deleteThought(${thought.id})">
+                                    <i class="fa fa-trash"></i> 删除
+                                </div>
+                            </div>
                         </div>
                     `);
                 });
-                
-                if (thoughts.length === 0) {
-                    $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
-                }
             }
             
             // 允许Enter键发送（Ctrl+Enter换行）
@@ -606,18 +1089,24 @@
                 }
             });
             
-            // 初始化一些示例数据（第一次访问时）
-            if (!localStorage.getItem('thoughts')) {
-                const sampleThoughts = [
-                    {id: 1, content: '今天发现了一部超好看的番剧！推荐给大家～', time: new Date().toLocaleString(), likes: 0},
-                    {id: 2, content: '学习前端开发真的很有趣，特别是能做出酷炫的动画效果时！', time: new Date().toLocaleString(), likes: 0}
-                ];
-                localStorage.setItem('thoughts', JSON.stringify(sampleThoughts));
-                loadThoughts();
-            }
+            // 初始化
+            updateStats();
+            loadThoughts();
         });
         
-        // 删除想法函数
+        // 全局函数
+        function likeThought(id) {
+            let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+            const thoughtIndex = thoughts.findIndex(t => t.id === id);
+            if (thoughtIndex !== -1) {
+                thoughts[thoughtIndex].likes++;
+                localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                
+                // 更新显示
+                $(`[data-id="${id}"] .fa-thumbs-up`).parent().html(`<i class="fa fa-thumbs-up"></i> ${thoughts[thoughtIndex].likes}`);
+            }
+        }
+        
         function deleteThought(id) {
             if (confirm('确定要删除这条想法吗？')) {
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
@@ -625,94 +1114,40 @@
                 localStorage.setItem('thoughts', JSON.stringify(thoughts));
                 
                 // 重新加载
-                $(document).ready(function() {
-                    let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
-                    $('#thoughts-list').empty();
-                    
-                    thoughts.forEach(thought => {
-                        $('#thoughts-list').append(`
-                            <div class="thought-item" data-id="${thought.id}">
-                                <div class="thought-header">
-                                    <span class="thought-time">${thought.time}</span>
-                                    <span class="delete-thought" onclick="deleteThought(${thought.id})">删除</span>
-                                </div>
-                                <div class="thought-content">${thought.content}</div>
-                            </div>
-                        `);
-                    });
-                    
-                    if (thoughts.length === 0) {
-                        $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
-                    }
+                $(`[data-id="${id}"]`).fadeOut(300, function() {
+                    $(this).remove();
                 });
+                
+                // 如果没有想法了，显示提示
+                if (thoughts.length === 0) {
+                    setTimeout(() => {
+                        $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
+                    }, 300);
+                }
             }
         }
-    </script>
-    
-    <!-- 原页面其他脚本保持不变 -->
-    <script type="text/javascript">
-        console.clear();
-        console.log("%c 欢迎来到二次元的世界！", "background:#ff7eb3; color:white; padding:5px; border-radius:3px", "");
-        console.log("%c Github %c", "background:#24272A; color:#ffffff", "", "https://github.com");
         
-        // 雪花效果（保留）
-        (function ($) {
-            $.fn.snow = function (options) {
-                var $flake = $('<div id="snowbox" />').css({ 'position': 'absolute', 'z-index': '9999', 'top': '-50px' }).html('❄'),
-                    documentHeight = $(document).height(),
-                    documentWidth = $(document).width(),
-                    defaults = {
-                        minSize: 10,
-                        maxSize: 30,
-                        newOn: 800,
-                        flakeColor: "#FFB6C1" /* 粉色雪花 */
-                    },
-                    options = $.extend({}, defaults, options);
-                var interval = setInterval(function () {
-                    var startPositionLeft = Math.random() * documentWidth - 100,
-                        startOpacity = 0.5 + Math.random(),
-                        sizeFlake = options.minSize + Math.random() * options.maxSize,
-                        endPositionTop = documentHeight - 200,
-                        endPositionLeft = startPositionLeft - 500 + Math.random() * 500,
-                        durationFall = documentHeight * 10 + Math.random() * 5000;
-                    $flake.clone().appendTo('body').css({
-                        left: startPositionLeft,
-                        opacity: startOpacity,
-                        'font-size': sizeFlake,
-                        color: options.flakeColor
-                    }).animate({
-                        top: endPositionTop,
-                        left: endPositionLeft,
-                        opacity: 0.2
-                    }, durationFall, 'linear', function () {
-                        $(this).remove()
-                    });
-                }, options.newOn);
-            };
-        })(jQuery);
-        $(function () {
-            $.fn.snow({
-                minSize: 5,
-                maxSize: 30,
-                newOn: 800
-            });
-        });
-
-        // 浏览器搞笑标题（保留但修改内容）
+        // 浏览器搞笑标题
         var OriginTitle = document.title;
         var titleTime;
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
-                document.title = '(>_<) 不要离开嘛～';
+                document.title = '(>_<) 专注学习去了吗？';
                 clearTimeout(titleTime);
             }
             else {
-                document.title = '(๑>ᴗ<๑) 欢迎回来！';
+                document.title = '(*^▽^*) 欢迎回来！';
                 titleTime = setTimeout(function () {
                     document.title = OriginTitle;
                 }, 2000);
             }
         });
+        
+        // 控制台欢迎信息
+        console.clear();
+        console.log("%c 欢迎来到百夜的学术二次元空间！", "background: linear-gradient(90deg, #6751b9, #8a74f9); color:white; padding:10px; border-radius:5px; font-weight:bold", "");
+        console.log("%c 这里融合了学术严谨与二次元趣味", "color: #a0aec0", "");
+        console.log("%c GitHub %c https://github.com", "background:#24272A; color:#ffffff; padding:3px 6px; border-radius:3px", "", "color: #60a5fa");
     </script>
 </body>
 
