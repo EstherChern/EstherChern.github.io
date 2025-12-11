@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
     <title>百夜 | 学术与二次元</title>
-    <meta name="description" content="SYSU数学系大三在读，二次元爱好者，技术博客">
+    <meta name="description" content="SYSU数学系大三在读，二次元爱好者，学习博客">
     <meta name="keywords" content="个人博客,开发者,数学,编程,二次元">
     <meta name="format-detection" content="telephone=no">
     <link rel="shortcut icon" href="favicon.ico">
@@ -28,7 +28,7 @@
             line-height: 1.6;
             background-image: 
                 linear-gradient(rgba(15, 20, 25, 0.9), rgba(15, 20, 25, 0.95)),
-                url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=2093&auto=format&fit=crop');
+                url('https://images3.alphacoders.com/135/thumbbig-1358482.webp');
             background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
@@ -705,7 +705,7 @@
                 <!-- 个人资料卡片 -->
                 <div class="card profile-card">
                     <div class="profile-avatar">
-                        <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" alt="头像">
+                        <img src="https://images3.alphacoders.com/135/thumbbig-1358482.webp" alt="头像">
                     </div>
                     <h2 class="profile-name">摸鱼爱好者</h2>
                     <p class="profile-bio">SYSU数学系大三在读<br>二次元爱好者 | 前端开发者<br>永远保持求知欲</p>
@@ -749,7 +749,7 @@
                         data-placeholder="点击编辑今日心情..."
                         onfocus="if(this.innerText === '点击编辑今日心情...') this.innerText = ''"
                         onblur="if(this.innerText.trim() === '') this.innerText = '点击编辑今日心情...'"
-                    >今天专注学习了5小时，完成了数学分析和前端项目，继续加油！</div>
+                    ></div>
                     <div class="mood-actions" id="mood-actions" style="display: none;">
                         <button class="mood-btn" onclick="cancelEditMood()">取消</button>
                         <button class="mood-btn mood-btn-primary" onclick="saveMood()">保存</button>
@@ -877,70 +877,7 @@
                     
                     <div class="thoughts-list" id="thoughts-list">
                         <!-- 想法列表将在这里动态生成 -->
-                        <div class="thought-item">
-                            <div class="thought-header">
-                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
-                                <div>
-                                    <div class="thought-author">摸鱼爱好者</div>
-                                    <div class="thought-time">2小时前</div>
-                                </div>
-                            </div>
-                            <div class="thought-content">
-                                今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！
-                            </div>
-                            <div class="thought-images">
-                                <!-- 示例图片 -->
-                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop')">
-                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop" alt="示例图片">
-                                </div>
-                            </div>
-                            <div class="thought-actions">
-                                <div class="thought-action" onclick="likeThought(1)">
-                                    <i class="fa fa-thumbs-up"></i> 12
-                                </div>
-                                <div class="thought-action">
-                                    <i class="fa fa-comment"></i> 5
-                                </div>
-                                <div class="thought-action">
-                                    <i class="fa fa-share"></i> 分享
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="thought-item">
-                            <div class="thought-header">
-                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
-                                <div>
-                                    <div class="thought-author">摸鱼爱好者</div>
-                                    <div class="thought-time">昨天</div>
-                                </div>
-                            </div>
-                            <div class="thought-content">
-                                最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。
-                            </div>
-                            <div class="thought-images">
-                                <!-- 示例图片 -->
-                                <div class="thought-image-item" onclick="viewImage('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w-400&auto=format&fit=crop')">
-                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop" alt="示例图片">
-                                </div>
-                            </div>
-                            <div class="thought-actions">
-                                <div class="thought-action" onclick="likeThought(2)">
-                                    <i class="fa fa-thumbs-up"></i> 24
-                                </div>
-                                <div class="thought-action">
-                                    <i class="fa fa-comment"></i> 8
-                                </div>
-                                <div class="thought-action">
-                                    <i class="fa fa-share"></i> 分享
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+                     
         <footer>
             <div id="footer-wrap">
                 <div class="copyright">&copy; 2023 百夜 | 中山大学数学系 | All shall be well, and all shall be well, and all manner of things shall be well.</div>
@@ -1283,29 +1220,7 @@
                 let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
                 $('#thoughts-list').empty();
                 
-                if (thoughts.length === 0) {
-                    // 使用示例想法
-                    thoughts = [
-                        {
-                            id: 1,
-                            content: '今天在研究图论中的最短路径算法，Dijkstra算法和Floyd算法的对比非常有意思。图论真的是计算机科学和数学的完美结合！',
-                            time: '2小时前',
-                            likes: 12,
-                            comments: 5,
-                            images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop']
-                        },
-                        {
-                            id: 2,
-                            content: '最近在追《Code Geass 反叛的鲁路修》，主角的智谋和策略让人叹为观止。数学中的博弈论和剧情中的策略对决有异曲同工之妙。',
-                            time: '昨天',
-                            likes: 24,
-                            comments: 8,
-                            images: ['https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&auto=format&fit=crop']
-                        }
-                    ];
-                    localStorage.setItem('thoughts', JSON.stringify(thoughts));
-                }
-                
+               
                 thoughts.forEach(thought => {
                     let imagesHtml = '';
                     if (thought.images && thought.images.length > 0) {
