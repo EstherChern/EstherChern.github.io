@@ -1,12 +1,719 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人网站</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+    <title>百夜</title>
+    <meta name="description" content="二次元,知乎用户,SYSU数学系大三在读">
+    <meta name="keywords" content="个人博客,开发者">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
+    <style>
+        .anime-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ff7eb3;
+            position: relative;
+        }
+        
+        .anime-section::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff7eb3" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>');
+            background-size: contain;
+        }
+        
+        .pomodoro-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .pomodoro-display {
+            font-size: 4em;
+            font-family: 'Digital', monospace;
+            color: #ff4081;
+            text-shadow: 0 0 10px rgba(255, 64, 129, 0.5);
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 10px 30px;
+            border-radius: 10px;
+            border: 3px dashed #ff4081;
+        }
+        
+        .pomodoro-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .anime-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff4081, #ff7eb3);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .anime-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 64, 129, 0.4);
+        }
+        
+        .anime-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .pomodoro-history {
+            width: 100%;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 2px dashed #ff7eb3;
+            padding-top: 15px;
+        }
+        
+        .history-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255, 126, 179, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ff4081;
+        }
+        
+        .thoughts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .thoughts-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .thoughts-input textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ff7eb3;
+            border-radius: 15px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .thoughts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .thought-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ffccd5;
+            position: relative;
+        }
+        
+        .thought-item::before {
+            content: '✦';
+            position: absolute;
+            left: -25px;
+            top: 15px;
+            color: #ff4081;
+            font-size: 20px;
+        }
+        
+        .thought-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #ffccd5;
+        }
+        
+        .thought-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .delete-thought {
+            color: #ff4081;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .anime-title {
+            color: #ff4081;
+            border-bottom: 3px solid #ff7eb3;
+            padding-bottom: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .character-float {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 120px;
+            opacity: 0.8;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 126, 179, 0.1);
+            border-radius: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            color: #ff4081;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+    <script type="text/javascript">
+        if (!!window.ActiveXObject || "ActiveXObject" in window) {
+            alert('朋友，上古浏览器不支持呢~');
+        }
+    </script>
 </head>
+
 <body>
-    <h1>你好，世界！</h1>
-    <p>欢迎来到我的第一个个人网站。这里是使用 GitHub Pages 搭建的。</p>
+    <div id="body-wrap">
+        <nav class="not_index_bg" id="nav" style="background-image:url(https://api.ixiaowai.cn/api/api.php)">
+            <div id="page_site-info">
+                <div id="site-title">
+                    <span class="blogtitle"></span>
+                    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+                    <script>
+                        var typed = new Typed(".blogtitle", {
+                            strings: ['二次元的世界，无限可能', 'Welcome to Anime World'],
+                            startDelay: 300,
+                            typeSpeed: 100,
+                            loop: true,
+                            backSpeed: 50,
+                            showCursor: true
+                        });
+                    </script>
+                </div>
+            </div>
+        </nav>
+        <main id="content-outer">
+            <div class="layout_page" id="content-inner">
+                <div class="aside_content" id="aside_content">
+                    <div class="card-widget card-info">
+                        <div class="card-content">
+                            <div class="card-info-avatar is-center">
+                                <img class="avatar-img"
+                                    src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg"
+                                    alt="avatar">
+                                <div class="author-info__name">摸鱼爱好者</div>
+                                <div class="author-info__description">学生<br>永远保持求知欲</div>
+                            </div>
+                            <div class="card-info-social-icons is-center">
+                                <a class="social-icon" href="https://github.com" target="_blank">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                                <a class="social-icon" href="#" target="_blank">
+                                    <i class="fa fa-weibo"></i>
+                                </a>
+                                <a class="social-icon" href="#" target="_blank">
+                                    <i class="fa fa-bilibili"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-widget card-announcement">
+                        <div class="card-content">
+                            <div class="item-headline">
+                                <i class="fa fa-heart" aria-hidden="true"></i>
+                                <span>今日心情</span>
+                            </div>
+                            <div id="daily-mood">今天也是元气满满的一天呢！(๑•̀ㅂ•́)و✧</div>
+                        </div>
+                    </div>
+
+                    <div class="card-widget card-webinfo">
+                        <div class="card-content">
+                            <div class="item-headline">
+                                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                <span>次元数据</span>
+                            </div>
+                            <div class="webinfo">
+                                <div class="webinfo-item">
+                                    <div class="webinfo-site-uv-name">本日专注时长 :</div>
+                                    <div class="webinfo-site-uv-count" id="focus-today">0 分钟</div>
+                                </div>
+                                <div class="webinfo-item">
+                                    <div class="webinfo-site-name">累计番茄钟 :</div>
+                                    <div class="webinfo-site-pv-count" id="total-pomodoro">0 个</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <article id="page">
+                    <div class="article-container">
+                        <h2>音乐</h2>
+                        <meting-js auto="https://y.qq.com/n/yqq/playlist/7713574197.html">
+                        </meting-js>
+                        <hr>
+
+                        <!-- 番茄钟模块 -->
+                        <div class="anime-section">
+                            <h2 class="anime-title">✧ 二次元番茄钟 ✧</h2>
+                            <div class="pomodoro-container">
+                                <div class="stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="completed-today">0</div>
+                                        <div class="stat-label">今日完成</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="total-focus">0</div>
+                                        <div class="stat-label">总专注时长(分钟)</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="current-streak">0</div>
+                                        <div class="stat-label">连续天数</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="pomodoro-display" id="timer-display">25:00</div>
+                                
+                                <div class="pomodoro-controls">
+                                    <button class="anime-btn" id="start-btn">开始专注</button>
+                                    <button class="anime-btn" id="pause-btn" style="display:none">暂停</button>
+                                    <button class="anime-btn" id="reset-btn">重置</button>
+                                    <button class="anime-btn" id="short-break">短休息(5分)</button>
+                                    <button class="anime-btn" id="long-break">长休息(15分)</button>
+                                </div>
+                                
+                                <div class="pomodoro-history">
+                                    <h4>⌛ 今日记录</h4>
+                                    <div id="history-list"></div>
+                                </div>
+                            </div>
+                            <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352614.png" 
+                                 class="character-float" alt="二次元角色">
+                        </div>
+
+                        <!-- 说说模块 -->
+                        <div class="anime-section">
+                            <h2 class="anime-title">✦ 今日想法 ✦</h2>
+                            <div class="thoughts-container">
+                                <div class="thoughts-input">
+                                    <textarea id="new-thought" placeholder="分享你的想法... (๑>ᴗ<๑)"></textarea>
+                                    <button class="anime-btn" id="post-thought">发布</button>
+                                </div>
+                                
+                                <div class="thoughts-list" id="thoughts-list">
+                                    <!-- 想法会动态加载到这里 -->
+                                </div>
+                            </div>
+                        </div>
+
+                </article>
+            </div>
+        </main>
+        <footer id="footer">
+            <div id="footer-wrap">
+                <div class="copyright">&copy;</div>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@3.0.0/instantpage.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js" async></script>
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            // 番茄钟功能
+            let timer;
+            let minutes = 25;
+            let seconds = 0;
+            let isRunning = false;
+            let isBreak = false;
+            let completedCount = 0;
+            let totalFocusTime = 0;
+            let today = new Date().toDateString();
+            
+            // 加载存储的数据
+            loadPomodoroData();
+            loadThoughts();
+            
+            // 初始化显示
+            updateDisplay();
+            
+            // 番茄钟功能函数
+            function startTimer() {
+                if (!isRunning) {
+                    isRunning = true;
+                    timer = setInterval(updateTimer, 1000);
+                    $('#start-btn').hide();
+                    $('#pause-btn').show();
+                }
+            }
+            
+            function pauseTimer() {
+                isRunning = false;
+                clearInterval(timer);
+                $('#start-btn').show();
+                $('#pause-btn').hide();
+            }
+            
+            function resetTimer() {
+                pauseTimer();
+                minutes = isBreak ? 5 : 25;
+                seconds = 0;
+                updateDisplay();
+            }
+            
+            function updateTimer() {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        // 时间到
+                        clearInterval(timer);
+                        isRunning = false;
+                        
+                        if (!isBreak) {
+                            // 完成一个番茄钟
+                            completedCount++;
+                            totalFocusTime += 25;
+                            savePomodoroRecord();
+                            updateStats();
+                            alert('🍅 恭喜完成一个番茄钟！休息一下吧～');
+                            startBreak(5);
+                        } else {
+                            // 休息结束
+                            alert('休息结束，继续加油吧！(๑•̀ㅂ•́)و✧');
+                            isBreak = false;
+                            minutes = 25;
+                            seconds = 0;
+                            updateDisplay();
+                        }
+                        $('#start-btn').show();
+                        $('#pause-btn').hide();
+                        return;
+                    }
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                updateDisplay();
+            }
+            
+            function updateDisplay() {
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                $('#timer-display').text(display);
+                
+                // 更新标题显示
+                const prefix = isBreak ? '休息中 - ' : '专注中 - ';
+                document.title = prefix + display;
+            }
+            
+            function startBreak(minutesBreak) {
+                isBreak = true;
+                minutes = minutesBreak;
+                seconds = 0;
+                isRunning = false;
+                updateDisplay();
+                alert(`开始${minutesBreak}分钟休息～`);
+            }
+            
+            function savePomodoroRecord() {
+                const record = {
+                    time: new Date().toLocaleString(),
+                    type: 'pomodoro',
+                    duration: 25
+                };
+                
+                let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                history.push(record);
+                localStorage.setItem('pomodoroHistory', JSON.stringify(history));
+                
+                // 更新今日数据
+                const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
+                if (todayData.date !== today) {
+                    todayData.date = today;
+                    todayData.completed = 0;
+                    todayData.focusTime = 0;
+                }
+                todayData.completed++;
+                todayData.focusTime += 25;
+                localStorage.setItem('todayStats', JSON.stringify(todayData));
+                
+                updateHistoryList();
+            }
+            
+            function loadPomodoroData() {
+                // 加载历史记录
+                updateHistoryList();
+                
+                // 加载统计数据
+                updateStats();
+            }
+            
+            function updateHistoryList() {
+                let history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                const todayHistory = history.filter(record => 
+                    new Date(record.time).toDateString() === today
+                );
+                
+                $('#history-list').empty();
+                todayHistory.slice(-5).forEach(record => {
+                    $('#history-list').prepend(
+                        `<div class="history-item">
+                            🍅 ${record.time.split(' ')[1]} - 完成25分钟专注
+                        </div>`
+                    );
+                });
+                
+                if (todayHistory.length === 0) {
+                    $('#history-list').html('<div class="history-item">今天还没有记录呢，开始第一个番茄钟吧！</div>');
+                }
+            }
+            
+            function updateStats() {
+                const todayData = JSON.parse(localStorage.getItem('todayStats') || '{}');
+                const history = JSON.parse(localStorage.getItem('pomodoroHistory') || '[]');
+                
+                $('#completed-today').text(todayData.completed || 0);
+                $('#total-focus').text(todayData.focusTime || 0);
+                $('#total-pomodoro').text(history.length + ' 个');
+                $('#focus-today').text((todayData.focusTime || 0) + ' 分钟');
+                
+                // 计算连续天数
+                let dates = [...new Set(history.map(r => new Date(r.time).toDateString()))];
+                dates.sort((a, b) => new Date(b) - new Date(a));
+                
+                let streak = 0;
+                let currentDate = new Date();
+                for (let i = 0; i < dates.length; i++) {
+                    const expectedDate = new Date(currentDate - i * 24 * 60 * 60 * 1000).toDateString();
+                    if (dates.includes(expectedDate)) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                $('#current-streak').text(streak);
+            }
+            
+            // 事件监听
+            $('#start-btn').click(startTimer);
+            $('#pause-btn').click(pauseTimer);
+            $('#reset-btn').click(resetTimer);
+            $('#short-break').click(() => startBreak(5));
+            $('#long-break').click(() => startBreak(15));
+            
+            // 说说功能
+            $('#post-thought').click(function() {
+                const thought = $('#new-thought').val().trim();
+                if (thought) {
+                    saveThought(thought);
+                    $('#new-thought').val('');
+                }
+            });
+            
+            function saveThought(content) {
+                const thought = {
+                    id: Date.now(),
+                    content: content,
+                    time: new Date().toLocaleString(),
+                    likes: 0
+                };
+                
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                thoughts.unshift(thought);
+                localStorage.setItem('thoughts', JSON.stringify(thoughts.slice(0, 50))); // 最多保存50条
+                
+                loadThoughts();
+            }
+            
+            function loadThoughts() {
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                $('#thoughts-list').empty();
+                
+                thoughts.forEach(thought => {
+                    $('#thoughts-list').append(`
+                        <div class="thought-item" data-id="${thought.id}">
+                            <div class="thought-header">
+                                <span class="thought-time">${thought.time}</span>
+                                <span class="delete-thought" onclick="deleteThought(${thought.id})">删除</span>
+                            </div>
+                            <div class="thought-content">${thought.content}</div>
+                        </div>
+                    `);
+                });
+                
+                if (thoughts.length === 0) {
+                    $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
+                }
+            }
+            
+            // 允许Enter键发送（Ctrl+Enter换行）
+            $('#new-thought').keydown(function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    return; // 允许换行
+                }
+                if (e.key === 'Enter' && !e.ctrlKey) {
+                    e.preventDefault();
+                    $('#post-thought').click();
+                }
+            });
+            
+            // 初始化一些示例数据（第一次访问时）
+            if (!localStorage.getItem('thoughts')) {
+                const sampleThoughts = [
+                    {id: 1, content: '今天发现了一部超好看的番剧！推荐给大家～', time: new Date().toLocaleString(), likes: 0},
+                    {id: 2, content: '学习前端开发真的很有趣，特别是能做出酷炫的动画效果时！', time: new Date().toLocaleString(), likes: 0}
+                ];
+                localStorage.setItem('thoughts', JSON.stringify(sampleThoughts));
+                loadThoughts();
+            }
+        });
+        
+        // 删除想法函数
+        function deleteThought(id) {
+            if (confirm('确定要删除这条想法吗？')) {
+                let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                thoughts = thoughts.filter(thought => thought.id !== id);
+                localStorage.setItem('thoughts', JSON.stringify(thoughts));
+                
+                // 重新加载
+                $(document).ready(function() {
+                    let thoughts = JSON.parse(localStorage.getItem('thoughts') || '[]');
+                    $('#thoughts-list').empty();
+                    
+                    thoughts.forEach(thought => {
+                        $('#thoughts-list').append(`
+                            <div class="thought-item" data-id="${thought.id}">
+                                <div class="thought-header">
+                                    <span class="thought-time">${thought.time}</span>
+                                    <span class="delete-thought" onclick="deleteThought(${thought.id})">删除</span>
+                                </div>
+                                <div class="thought-content">${thought.content}</div>
+                            </div>
+                        `);
+                    });
+                    
+                    if (thoughts.length === 0) {
+                        $('#thoughts-list').html('<div class="thought-item">还没有任何想法，快来分享吧！</div>');
+                    }
+                });
+            }
+        }
+    </script>
+    
+    <!-- 原页面其他脚本保持不变 -->
+    <script type="text/javascript">
+        console.clear();
+        console.log("%c 欢迎来到二次元的世界！", "background:#ff7eb3; color:white; padding:5px; border-radius:3px", "");
+        console.log("%c Github %c", "background:#24272A; color:#ffffff", "", "https://github.com");
+        
+        // 雪花效果（保留）
+        (function ($) {
+            $.fn.snow = function (options) {
+                var $flake = $('<div id="snowbox" />').css({ 'position': 'absolute', 'z-index': '9999', 'top': '-50px' }).html('❄'),
+                    documentHeight = $(document).height(),
+                    documentWidth = $(document).width(),
+                    defaults = {
+                        minSize: 10,
+                        maxSize: 30,
+                        newOn: 800,
+                        flakeColor: "#FFB6C1" /* 粉色雪花 */
+                    },
+                    options = $.extend({}, defaults, options);
+                var interval = setInterval(function () {
+                    var startPositionLeft = Math.random() * documentWidth - 100,
+                        startOpacity = 0.5 + Math.random(),
+                        sizeFlake = options.minSize + Math.random() * options.maxSize,
+                        endPositionTop = documentHeight - 200,
+                        endPositionLeft = startPositionLeft - 500 + Math.random() * 500,
+                        durationFall = documentHeight * 10 + Math.random() * 5000;
+                    $flake.clone().appendTo('body').css({
+                        left: startPositionLeft,
+                        opacity: startOpacity,
+                        'font-size': sizeFlake,
+                        color: options.flakeColor
+                    }).animate({
+                        top: endPositionTop,
+                        left: endPositionLeft,
+                        opacity: 0.2
+                    }, durationFall, 'linear', function () {
+                        $(this).remove()
+                    });
+                }, options.newOn);
+            };
+        })(jQuery);
+        $(function () {
+            $.fn.snow({
+                minSize: 5,
+                maxSize: 30,
+                newOn: 800
+            });
+        });
+
+        // 浏览器搞笑标题（保留但修改内容）
+        var OriginTitle = document.title;
+        var titleTime;
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                document.title = '(>_<) 不要离开嘛～';
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = '(๑>ᴗ<๑) 欢迎回来！';
+                titleTime = setTimeout(function () {
+                    document.title = OriginTitle;
+                }, 2000);
+            }
+        });
+    </script>
 </body>
+
 </html>
