@@ -12,56 +12,45 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- 前台特有样式 -->
     <style>
-        /* 保持原有的所有样式，这里省略以节省空间 */
-        /* 你可以保留原文件的所有CSS */
-        
-        /* 添加一些新样式 */
-        .github-badge {
+        .readonly-badge {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(25, 30, 40, 0.9);
-            border: 1px solid rgba(103, 81, 185, 0.5);
-            border-radius: 10px;
-            padding: 10px 15px;
-            z-index: 1000;
-            font-size: 12px;
+            top: 20px;
+            right: 20px;
+            background: rgba(103, 81, 185, 0.2);
             color: #c3b5f5;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
         }
         
-        .loading {
+        .github-storage-info {
             text-align: center;
-            padding: 40px;
+            margin-top: 20px;
+            font-size: 12px;
             color: #a0aec0;
         }
         
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(103, 81, 185, 0.3);
-            border-radius: 50%;
-            border-top-color: #6751b9;
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 15px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .github-storage-info i {
+            margin-right: 5px;
         }
     </style>
 </head>
 
 <body>
+    <div class="readonly-badge">
+        <i class="fa fa-eye"></i> 展示模式
+    </div>
+    
     <div id="body-wrap">
         <!-- 导航栏 -->
         <nav>
             <div id="site-title">
                 <span class="blogtitle">百夜 | 学术与二次元</span>
-            </div>
-            <div style="position: absolute; top: 10px; right: 20px; color: #a0aec0; font-size: 0.9rem;">
-                <i class="fa fa-eye"></i> 展示模式
             </div>
         </nav>
 
@@ -195,6 +184,10 @@
                             <p>加载想法中...</p>
                         </div>
                     </div>
+                    
+                    <div class="github-storage-info">
+                        <i class="fa fa-github"></i> 数据存储于 GitHub Issues
+                    </div>
                 </div>
             </div>
         </div>
@@ -203,57 +196,47 @@
             <div id="footer-wrap">
                 <div class="copyright">&copy; 2023 百夜 | 中山大学数学系</div>
                 <div style="margin-top: 10px; font-size: 0.8rem; color: #a0aec0;">
-                    数据存储于 GitHub Issues | 
                     <a href="admin.html" style="color: #8a74f9; text-decoration: none;">
-                        <i class="fa fa-lock"></i> 管理后台
+                        <i class="fa fa-lock"></i> 进入管理后台
                     </a>
                 </div>
             </div>
         </footer>
-        
-        <!-- GitHub 状态标识 -->
-        <div class="github-badge">
-            <i class="fa fa-github"></i> GitHub Issues 存储
-        </div>
     </div>
 
     <!-- 图片查看模态框 -->
-    <div id="image-viewer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;">
-        <div style="position: relative; max-width: 90%; max-height: 90%;">
-            <img id="viewed-image" src="" alt="" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
-            <button onclick="closeImageViewer()" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">×</button>
+    <div id="image-viewer" style="display: none;">
+        <div class="image-viewer-content">
+            <img id="viewed-image" src="" alt="">
+            <button onclick="closeImageViewer()" class="close-btn">×</button>
         </div>
     </div>
 
+    <!-- 外部 JS 库 -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
     
+    <!-- 项目 JS 文件 -->
+    <script src="js/github-api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/thoughts.js"></script>
+    <script src="js/pomodoro.js"></script>
+    
+    <!-- 前台页面初始化 -->
     <script>
-        // GitHub 配置 - 请替换为你的实际信息
-        const GITHUB_CONFIG = {
-            // 你的 GitHub 用户名
-            username: '你的GitHub用户名',
-            // 用于存储的仓库名
-            repo: '你的仓库名',
-            // OAuth App 的 Client ID
-            clientId: 'YOUR_CLIENT_ID',
-            // GitHub API 基础 URL
-            apiBase: 'https://api.github.com',
-            // Issues 标签定义
-            labels: {
-                thought: 'thought',      // 想法
-                pomodoro: 'pomodoro',    // 番茄钟
-                mood: 'mood',           // 心情
-                stat: 'stat'            // 统计数据
-            }
+        // 配置
+        const CONFIG = {
+            repoOwner: '你的GitHub用户名',
+            repoName: '你的仓库名'
         };
-
-        // 存储访问令牌
-        let accessToken = localStorage.getItem('github_access_token');
-
+        
+        // 全局变量
+        let githubAPI = null;
+        let currentUser = null;
+        
         $(document).ready(function() {
             // 初始化动态标题
             var typed = new Typed(".blogtitle", {
@@ -273,16 +256,6 @@
                     artist: '纯音乐',
                     url: 'https://music.163.com/song/media/outer/url?id=1859245776.mp3',
                     cover: 'https://p2.music.126.net/y-pQkLXU4Z5aXkQzSDSjag==/109951166118847666.jpg'
-                }, {
-                    name: '宁静钢琴曲',
-                    artist: '钢琴曲',
-                    url: 'https://music.163.com/song/media/outer/url?id=1392997646.mp3',
-                    cover: 'https://p1.music.126.net/5J1ZvhykLQxqKp5Wv-3X0w==/109951164119981465.jpg'
-                }, {
-                    name: '白噪音 - 雨声',
-                    artist: '自然声音',
-                    url: 'https://music.163.com/song/media/outer/url?id=1463165983.mp3',
-                    cover: 'https://p1.music.126.net/MJ8Nw-kr3wT9PEO8Dnl_qw==/109951164215003212.jpg'
                 }],
                 volume: 0.7,
                 fixed: false,
@@ -291,93 +264,16 @@
                 theme: '#6751b9'
             });
             
-            // 加载所有数据
+            // 加载数据
             loadAllData();
         });
         
-        // GitHub API 相关函数
-        async function githubRequest(endpoint, options = {}) {
-            const url = `${GITHUB_CONFIG.apiBase}${endpoint}`;
-            
-            const headers = {
-                'Accept': 'application/vnd.github.v3+json',
-                ...options.headers
-            };
-            
-            // 如果有访问令牌，添加到请求头
-            if (accessToken) {
-                headers['Authorization'] = `token ${accessToken}`;
-            }
-            
-            const response = await fetch(url, {
-                ...options,
-                headers
-            });
-            
-            if (!response.ok) {
-                throw new Error(`GitHub API 请求失败: ${response.status}`);
-            }
-            
-            return response.json();
-        }
-        
-        // 获取 Issues
-        async function getIssues(label = null, state = 'open') {
-            let endpoint = `/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/issues`;
-            let params = [];
-            
-            if (label) {
-                params.push(`labels=${label}`);
-            }
-            if (state) {
-                params.push(`state=${state}`);
-            }
-            
-            if (params.length > 0) {
-                endpoint += `?${params.join('&')}`;
-            }
-            
-            return githubRequest(endpoint);
-        }
-        
-        // 创建 Issue
-        async function createIssue(title, body, labels = []) {
-            const endpoint = `/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/issues`;
-            
-            return githubRequest(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title,
-                    body,
-                    labels
-                })
-            });
-        }
-        
-        // 更新 Issue
-        async function updateIssue(issueNumber, updates) {
-            const endpoint = `/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/issues/${issueNumber}`;
-            
-            return githubRequest(endpoint, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updates)
-            });
-        }
-        
-        // 关闭 Issue
-        async function closeIssue(issueNumber) {
-            return updateIssue(issueNumber, { state: 'closed' });
-        }
-        
-        // 数据加载函数
+        // 加载所有数据
         async function loadAllData() {
             try {
+                // 使用公共 GitHub API（无需认证）
+                githubAPI = new GitHubAPI(null, CONFIG.repoOwner, CONFIG.repoName);
+                
                 // 并行加载所有数据
                 await Promise.all([
                     loadTodayMood(),
@@ -385,25 +281,20 @@
                     loadPomodoroData(),
                     loadStatistics()
                 ]);
+                
+                console.log('数据加载完成');
             } catch (error) {
                 console.error('加载数据失败:', error);
-                showErrorMessage('数据加载失败，请检查网络连接');
+                showMessage('数据加载失败，请稍后重试', 'error');
             }
         }
         
         // 加载今日心情
         async function loadTodayMood() {
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const issues = await getIssues(GITHUB_CONFIG.labels.mood);
-                
-                // 查找今天的心情
-                const todayMood = issues.find(issue => {
-                    const issueDate = new Date(issue.created_at).toISOString().split('T')[0];
-                    return issueDate === today;
-                });
-                
+                const todayMood = await githubAPI.getTodayMood();
                 const moodDisplay = document.getElementById('mood-display');
+                
                 if (todayMood) {
                     moodDisplay.innerHTML = `<div class="mood-content">${todayMood.body}</div>`;
                 } else {
@@ -417,49 +308,12 @@
         // 加载想法
         async function loadThoughts() {
             try {
-                const issues = await getIssues(GITHUB_CONFIG.labels.thought);
-                const thoughtsList = document.getElementById('thoughts-list');
-                
-                if (issues.length === 0) {
-                    thoughtsList.innerHTML = `
-                        <div class="thought-item">
-                            <div style="text-align: center; color: #a0aec0; padding: 40px 20px;">
-                                <i class="fa fa-pencil" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
-                                <p>还没有发布任何想法</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = '';
-                issues.forEach(issue => {
-                    const createTime = new Date(issue.created_at).toLocaleString('zh-CN');
-                    const body = JSON.parse(issue.body || '{}');
-                    
-                    html += `
-                        <div class="thought-item">
-                            <div class="thought-header">
-                                <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
-                                <div>
-                                    <div class="thought-author">摸鱼爱好者</div>
-                                    <div class="thought-time">${createTime}</div>
-                                </div>
-                            </div>
-                            <div class="thought-content">${body.content || issue.title}</div>
-                            <div class="thought-actions">
-                                <div class="thought-action">
-                                    <i class="fa fa-thumbs-up"></i> ${issue.reactions ? issue.reactions['+1'] : 0}
-                                </div>
-                                <div class="thought-action">
-                                    <i class="fa fa-comment"></i> ${issue.comments}
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                const thoughts = await githubAPI.getIssues({ 
+                    labels: ['thought', 'personal-blog'],
+                    per_page: 10 
                 });
                 
-                thoughtsList.innerHTML = html;
+                thoughtsManager.displayThoughts(thoughts, 'thoughts-list');
             } catch (error) {
                 console.error('加载想法失败:', error);
             }
@@ -468,23 +322,24 @@
         // 加载番茄钟数据
         async function loadPomodoroData() {
             try {
-                const issues = await getIssues(GITHUB_CONFIG.labels.pomodoro);
                 const today = new Date().toISOString().split('T')[0];
+                const pomodoros = await githubAPI.getIssues({ 
+                    labels: ['pomodoro', 'personal-blog'],
+                    per_page: 50 
+                });
                 
-                // 今日完成记录
-                const todayRecords = issues.filter(issue => {
+                const todayRecords = pomodoros.filter(issue => {
                     const issueDate = new Date(issue.created_at).toISOString().split('T')[0];
                     return issueDate === today;
                 });
                 
-                // 更新显示
                 const historyList = document.getElementById('history-list');
                 if (todayRecords.length === 0) {
-                    historyList.innerHTML = '<div class="history-item">今天还没有记录，开始第一个番茄钟吧！</div>';
+                    historyList.innerHTML = '<div class="history-item">今天还没有记录</div>';
                 } else {
                     let html = '';
-                    todayRecords.slice(0, 5).forEach(record => {
-                        const time = new Date(record.created_at).toLocaleTimeString('zh-CN', { 
+                    todayRecords.slice(0, 5).forEach(issue => {
+                        const time = new Date(issue.created_at).toLocaleTimeString('zh-CN', { 
                             hour: '2-digit', 
                             minute: '2-digit' 
                         });
@@ -498,8 +353,8 @@
                     historyList.innerHTML = html;
                 }
                 
-                // 更新累计数量
-                document.getElementById('total-pomodoro').textContent = issues.length;
+                // 更新统计数据
+                document.getElementById('total-pomodoro').textContent = pomodoros.length;
                 
                 // 计算今日专注时间
                 const todayFocusMinutes = todayRecords.length * 25;
@@ -507,25 +362,6 @@
                 const todayMinutes = todayFocusMinutes % 60;
                 document.getElementById('focus-today').textContent = 
                     `${todayHours > 0 ? todayHours + 'h' : ''}${todayMinutes}m`;
-                
-                // 计算连续天数
-                const dates = [...new Set(issues.map(issue => 
-                    new Date(issue.created_at).toISOString().split('T')[0]
-                ))];
-                dates.sort((a, b) => new Date(b) - new Date(a));
-                
-                let streak = 0;
-                let currentDate = new Date();
-                for (let i = 0; i < dates.length; i++) {
-                    const expectedDate = new Date(currentDate - i * 24 * 60 * 60 * 1000)
-                        .toISOString().split('T')[0];
-                    if (dates.includes(expectedDate)) {
-                        streak++;
-                    } else {
-                        break;
-                    }
-                }
-                document.getElementById('current-streak').textContent = streak;
                 
             } catch (error) {
                 console.error('加载番茄钟数据失败:', error);
@@ -535,47 +371,34 @@
         // 加载统计数据
         async function loadStatistics() {
             try {
-                const issues = await getIssues(GITHUB_CONFIG.labels.stat);
-                
-                // 如果有统计数据，更新显示
-                if (issues.length > 0) {
-                    const latestStat = issues[0];
-                    const stats = JSON.parse(latestStat.body || '{}');
-                    
-                    // 可以在这里更新统计数据
-                    // 例如：document.getElementById('some-stat').textContent = stats.value;
-                }
+                // 这里可以添加更多统计数据的计算
+                // 比如连续天数等
             } catch (error) {
                 console.error('加载统计数据失败:', error);
             }
         }
         
-        // 错误提示
-        function showErrorMessage(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `
-                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); 
-                     border-radius: 8px; padding: 15px; margin: 20px; color: #f87171;">
-                    <i class="fa fa-exclamation-triangle"></i> ${message}
-                </div>
+        // 显示消息
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                border-radius: 8px;
+                background: ${type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(103, 81, 185, 0.9)'};
+                color: white;
+                z-index: 9999;
             `;
             
-            // 插入到页面顶部
-            document.querySelector('#body-wrap').insertBefore(errorDiv, document.querySelector('nav'));
+            document.body.appendChild(messageDiv);
             
-            // 5秒后自动移除
-            setTimeout(() => errorDiv.remove(), 5000);
-        }
-        
-        // 图片查看器函数
-        function viewImage(imageSrc) {
-            document.getElementById('viewed-image').src = imageSrc;
-            document.getElementById('image-viewer').style.display = 'flex';
-        }
-        
-        function closeImageViewer() {
-            document.getElementById('image-viewer').style.display = 'none';
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
         }
     </script>
 </body>
