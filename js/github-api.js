@@ -50,35 +50,60 @@ class GitHubAPI {
 
     // Generic issues fetch with safe fallback
     // params: { labels: ['a','b'], state: 'all', per_page: 20 }
-    async getIssues(params = {}) {
-        if (!this.owner || !this.repo) {
-            console.warn('getIssues: owner/repo not specified');
-            return [];
-        }
-
-        const qs = new URLSearchParams({
-            state: params.state || 'all',
-            per_page: params.per_page || 20
-        });
-
-        if (params.labels && Array.isArray(params.labels)) {
-            qs.set('labels', params.labels.join(','));
-        }
-
-        try {
-            const url = `${this.base}/repos/${this.owner}/${this.repo}/issues?${qs.toString()}`;
-            const res = await fetch(url, { headers: this.getHeaders() });
-            if (!res.ok) {
-                console.warn('getIssues non-ok:', res.status, await res.text());
-                return [];
-            }
-            const json = await res.json();
-            return Array.isArray(json) ? json : [];
-        } catch (err) {
-            console.error('getIssues error:', err);
-            return [];
-        }
+   // 在getIssues方法中添加更详细的错误信息
+async getIssues(params = {}) {
+    if (!this.owner || !this.repo) {
+        console.warn('getIssues: owner/repo not specified');
+        return [];
     }
+
+    const qs = new URLSearchParams({
+        state: params.state || 'all',
+        per_page: params.per_page || 20
+    });
+
+    if (params.labels && Array.isArray(params.labels)) {
+        qs.set('labels', params.labels.join(','));
+    }
+
+    try {
+        const url = `${this.base}/repos/${this.owner}/${this.repo}/issues?${qs.toString()}`;
+        console.log('Fetching issues from:', url);
+        
+        const res = await fetch(url, { 
+            headers: this.getHeaders(),
+            timeout: 10000 // 设置超时
+        });
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('GitHub API Error:', {
+                status: res.status,
+                statusText: res.statusText,
+                url: url,
+                error: errorText
+            });
+            
+            // 如果是404，说明仓库不存在或不可访问
+            if (res.status === 404) {
+                throw new Error(`仓库 ${this.owner}/${this.repo} 不存在或无法访问`);
+            }
+            
+            throw new Error(`GitHub API请求失败: ${res.status} ${res.statusText}`);
+        }
+        
+        const json = await res.json();
+        return Array.isArray(json) ? json : [];
+    } catch (err) {
+        console.error('getIssues error:', err);
+        // 如果是网络错误，返回空数组而不是抛出错误
+        if (err.name === 'TypeError' && err.message.includes('fetch')) {
+            console.warn('网络连接失败，请检查网络');
+            return [];
+        }
+        throw err; // 重新抛出其他错误
+    }
+}
 
     // Get "today mood" - find an issue titled with today's date or label mood
     async getTodayMood() {
