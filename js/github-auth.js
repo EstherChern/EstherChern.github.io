@@ -1,9 +1,9 @@
 // js/github-auth.js
 const GITHUB_CONFIG = {
-    clientId: 'YOUR_GITHUB_CLIENT_ID',  // 替换为你的 Client ID
+    clientId: 'Ov23liVfqw48OFq76vWI',  // 替换为你的 Client ID
     apiEndpoint: window.location.origin.includes('localhost') 
         ? 'http://localhost:3000/api/github-auth'
-        : '你的_VERCEL_URL/api/github-auth'
+        : 'https://esther-ivory-three.vercel.app/api/github-auth'
 };
 
 // 检查登录状态
