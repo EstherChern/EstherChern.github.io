@@ -1,7 +1,8 @@
 // js/github-auth.js
 const GITHUB_CONFIG = {
-    clientId: 'Ov23liVfqw48OFq76vWI',  // 替换为你的 Client ID
-    apiEndpoint: window.location.origin.includes('localhost') 
+    clientId: 'Ov23liVfqw48OFq76vWI',
+    redirectUri: 'https://estherchern.github.io/admin.html',
+    apiEndpoint: window.location.origin.includes('localhost')
         ? 'http://localhost:3000/api/github-auth'
         : 'https://esther-ivory-three.vercel.app/api/github-auth'
 };
@@ -19,7 +20,12 @@ function checkAuthStatus() {
 
 // GitHub 登录
 function githubLogin() {
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(window.location.href)}&scope=repo`;
+    const authUrl =
+        `https://github.com/login/oauth/authorize` +
+        `?client_id=${GITHUB_CONFIG.clientId}` +
+        `&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}` +
+        `&scope=repo`;
+
     window.location.href = authUrl;
 }
 
@@ -30,11 +36,9 @@ async function exchangeCodeForToken(code) {
         const data = await response.json();
         
         if (data.access_token) {
-            // 保存 token 和用户信息
             localStorage.setItem('github_access_token', data.access_token);
             localStorage.setItem('github_user', JSON.stringify(data.user));
             
-            // 清除 URL 中的 code 参数
             window.history.replaceState({}, document.title, window.location.pathname);
             
             return { success: true, user: data.user };
@@ -46,6 +50,7 @@ async function exchangeCodeForToken(code) {
         return { success: false, error: error.message };
     }
 }
+
 
 // 登出
 function logout() {
