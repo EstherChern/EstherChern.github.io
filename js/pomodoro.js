@@ -1,145 +1,133 @@
 // js/pomodoro.js
-const pomodoroManager = {
-    timer: null,
-    minutes: 25,
-    seconds: 0,
-    isRunning: false,
-    type: 'work', // 'work' 或 'break'
-    
-    // 开始计时
-    start: function() {
-        if (this.isRunning) return;
-        
-        this.isRunning = true;
-        document.getElementById('start-btn').style.display = 'none';
-        document.getElementById('pause-btn').style.display = 'flex';
-        document.getElementById('timer-status').textContent = 
-            this.type === 'work' ? '专注中...' : '休息中...';
-        
-        this.timer = setInterval(() => this.update(), 1000);
-    },
-    
-    // 暂停计时
-    pause: function() {
-        this.isRunning = false;
-        clearInterval(this.timer);
-        document.getElementById('start-btn').style.display = 'flex';
-        document.getElementById('pause-btn').style.display = 'none';
-        document.getElementById('timer-status').textContent = '已暂停';
-    },
-    
-    // 重置计时器
-    reset: function() {
-        this.pause();
-        this.minutes = this.type === 'work' ? 25 : 5;
-        this.seconds = 0;
-        this.updateDisplay();
-        document.getElementById('timer-status').textContent = '准备开始';
-    },
-    
-    // 设置休息时间
-    setBreak: function(minutes) {
-        this.type = 'break';
-        this.minutes = minutes;
-        this.seconds = 0;
-        this.reset();
-    },
-    
-    // 设置工作时间
-    setWork: function() {
-        this.type = 'work';
-        this.minutes = 25;
-        this.seconds = 0;
-        this.reset();
-    },
-    
-    // 更新时间
-    update: function() {
-        if (this.seconds === 0) {
-            if (this.minutes === 0) {
-                // 时间到
-                this.complete();
-                return;
-            }
-            this.minutes--;
-            this.seconds = 59;
-        } else {
-            this.seconds--;
-        }
-        this.updateDisplay();
-    },
-    
-    // 更新显示
-    updateDisplay: function() {
-        const display = document.getElementById('timer-display');
-        if (display) {
-            display.textContent = 
-                `${this.minutes.toString().padStart(2, '0')}:${this.seconds.toString().padStart(2, '0')}`;
-        }
-    },
-    
-    // 完成番茄钟
-    complete: function() {
-        this.pause();
-        
-        // 播放提示音
-        this.playSound();
-        
-        // 显示通知
-        if (Notification.permission === 'granted') {
-            new Notification('番茄钟完成', {
-                body: this.type === 'work' ? '恭喜完成一个番茄钟！休息一下吧～' : '休息结束，继续专注吧！',
-                icon: 'https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg'
-            });
-        }
-        
-        // 切换类型
-        if (this.type === 'work') {
-            document.getElementById('timer-status').innerHTML = '<span style="color:#4ade80;">🍅 番茄钟完成！</span>';
-            this.setBreak(5);
-            
-            // 如果是在后台页面且有 GitHub API，记录番茄钟
-            if (window.githubAPI && window.location.pathname.includes('admin.html')) {
-                this.recordPomodoro();
-            }
-        } else {
-            document.getElementById('timer-status').innerHTML = '<span style="color:#60a5fa;">休息结束，继续专注吧！</span>';
-            this.setWork();
-        }
-    },
-    
-    // 播放提示音
-    playSound: function() {
-        const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-        audio.volume = 0.3;
-        audio.play().catch(e => console.log('音频播放失败:', e));
-    },
-    
-    // 记录番茄钟到 GitHub
-    async recordPomodoro() {
-        if (!window.githubAPI) return;
-        
-        try {
-            await githubAPI.recordPomodoro(25, 'work');
-            console.log('番茄钟记录成功');
-            
-            // 刷新番茄钟数据
-            if (typeof loadPomodoroData === 'function') {
-                loadPomodoroData();
-            }
-        } catch (error) {
-            console.error('记录番茄钟失败:', error);
-        }
-    },
-    
-    // 初始化
-    init: function() {
-        this.updateDisplay();
+// Simple pomodoro manager for front & admin (window.pomodoroManager)
+
+(function () {
+    const DEFAULT_WORK = 25 * 60; // seconds
+    let timer = null;
+    let remaining = DEFAULT_WORK;
+    let running = false;
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60).toString().padStart(2, '0');
+        const s = Math.floor(sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
     }
-};
 
-// 初始化
-pomodoroManager.init();
+    function updateUI() {
+        const disp = document.getElementById('timer-display');
+        const status = document.getElementById('timer-status');
+        if (disp) disp.textContent = formatTime(remaining);
+        if (status) status.textContent = running ? '专注中' : '准备开始';
+        document.getElementById('pause-btn') && (document.getElementById('pause-btn').style.display = running ? 'inline-block' : 'none');
+    }
 
-// 导出给其他文件使用
-window.pomodoroManager = pomodoroManager;
+    function tick() {
+        if (remaining <= 0) {
+            stopInternal();
+            finishPomodoro();
+            return;
+        }
+        remaining -= 1;
+        updateUI();
+    }
+
+    function start() {
+        if (running) return;
+        running = true;
+        if (!timer) timer = setInterval(tick, 1000);
+        updateUI();
+    }
+
+    function pause() {
+        running = false;
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        updateUI();
+    }
+
+    function reset() {
+        pause();
+        remaining = DEFAULT_WORK;
+        updateUI();
+    }
+
+    function stopInternal() {
+        running = false;
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        remaining = DEFAULT_WORK;
+        updateUI();
+    }
+
+    async function finishPomodoro() {
+        showLocalMessage('完成一个番茄！', 'success');
+        // If backend token exists, post an issue
+        const token = localStorage.getItem('github_access_token');
+        const userStr = localStorage.getItem('github_user');
+        // githubAPI might be set by admin initialization or main
+        try {
+            if (window.githubAPI && token && userStr) {
+                // ensure token is set on the instance
+                window.githubAPI.setToken(token);
+                // need owner & repo set — admin usually sets currentRepo; front uses default
+                if (!window.githubAPI.owner || !window.githubAPI.repo) {
+                    console.warn('pomodoro: owner/repo not set, skipping create issue');
+                    return;
+                }
+                await window.githubAPI.postPomodoro();
+                showLocalMessage('番茄记录已同步到 GitHub', 'info');
+                // reload local view
+                if (typeof window.loadPomodoroData === 'function') window.loadPomodoroData();
+            } else {
+                console.info('pomodoro: not logged in or githubAPI not ready; skip server record');
+            }
+        } catch (err) {
+            console.error('finishPomodoro error:', err);
+            showLocalMessage('同步番茄记录失败', 'error');
+        }
+    }
+
+    function showLocalMessage(msg, type='info') {
+        // small non-blocking toast
+        const d = document.createElement('div');
+        d.className = `message ${type}`;
+        d.textContent = msg;
+        d.style.cssText = 'position:fixed;bottom:30px;left:30px;padding:8px 12px;border-radius:6px;background:rgba(0,0,0,0.7);color:#fff;z-index:9999';
+        document.body.appendChild(d);
+        setTimeout(()=>d.remove(), 2500);
+    }
+
+    // expose
+    window.pomodoroManager = {
+        start,
+        pause,
+        reset,
+        setBreak: (minutes) => {
+            pause();
+            remaining = minutes * 60;
+            updateUI();
+        }
+    };
+
+    // wire UI buttons if present
+    document.addEventListener('DOMContentLoaded', () => {
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const shortBtn = document.getElementById('short-break');
+        const longBtn = document.getElementById('long-break');
+
+        if (startBtn) startBtn.addEventListener('click', start);
+        if (pauseBtn) pauseBtn.addEventListener('click', pause);
+        if (resetBtn) resetBtn.addEventListener('click', reset);
+        if (shortBtn) shortBtn.addEventListener('click', () => { window.pomodoroManager.setBreak(5); });
+        if (longBtn) longBtn.addEventListener('click', () => { window.pomodoroManager.setBreak(15); });
+
+        updateUI();
+    });
+
+})();
