@@ -2,10 +2,10 @@
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-    // 设置 CORS 头，允许前端跨域请求
+    // 设置 CORS 头
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
                 client_id: process.env.GITHUB_CLIENT_ID,
                 client_secret: process.env.GITHUB_CLIENT_SECRET,
                 code: code,
-                redirect_uri: process.env.GITHUB_REDIRECT_URI || `${req.headers.origin || 'https://your-site.vercel.app'}/admin.html`
+                redirect_uri: process.env.GITHUB_REDIRECT_URI || req.headers.origin
             })
         });
 
