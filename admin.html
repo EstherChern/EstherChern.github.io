@@ -446,36 +446,60 @@
         let currentUser = null;
         let currentRepo = null;
         
-        // 页面加载时检查授权
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查 URL 中是否有授权码
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            
-            if (code) {
-                // 有授权码，进行交换
-                exchangeCodeForToken(code);
-            } else {
-                // 检查授权状态
-                const authStatus = checkAuthStatus();
-                
-                if (authStatus.isLoggedIn) {
-                    // 已授权，显示主界面
-                    document.getElementById('auth-container').style.display = 'none';
-                    document.getElementById('app-container').style.display = 'block';
-                    
-                    currentUser = authStatus.user;
-                    displayUserInfo(currentUser);
-                    
-                    // 初始化应用
-                    initializeApp();
-                } else {
-                    // 未授权，显示登录界面
-                    document.getElementById('auth-container').style.display = 'flex';
-                    document.getElementById('app-container').style.display = 'none';
-                }
-            }
-        });
+       // 页面加载时检查授权
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+        // 显示加载界面
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'none';
+
+        // 开始交换 token
+        const result = await exchangeCodeForToken(code);
+
+        if (result.success) {
+            // 登录成功后清除 code
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            currentUser = result.user;
+
+            // 显示主界面
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            displayUserInfo(currentUser);
+
+            // 初始化后台
+            initializeApp();
+        } else {
+            alert("登录失败：" + result.error);
+
+            // 显示重新登录按钮
+            document.getElementById('auth-container').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'none';
+        }
+
+    } else {
+        // 没有 code → 查看是否已经登录
+        const authStatus = checkAuthStatus();
+
+        if (authStatus.isLoggedIn) {
+            currentUser = authStatus.user;
+
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            displayUserInfo(currentUser);
+            initializeApp();
+        } else {
+            // 未登录 → 显示登录页面
+            document.getElementById('auth-container').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'none';
+        }
+    }
+});
         
         // 显示用户信息
         function displayUserInfo(user) {
