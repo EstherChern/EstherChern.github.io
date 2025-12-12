@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+    <title>后台管理 | 百夜</title>
+    <!-- 保持所有CSS样式相同 -->
+    <!-- 添加一些管理界面特有的样式 -->
+    <style>
+        .github-auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(25, 30, 40, 0.9);
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(103, 81, 185, 0.5);
+        }
+        
+        .auth-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #24292e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px 0;
+        }
+        
+        .auth-btn:hover {
+            background: #2c3138;
+            transform: translateY(-2px);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(103, 81, 185, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(25, 30, 40, 0.9);
+            border: 1px solid rgba(103, 81, 185, 0.5);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .sync-success {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        .sync-error {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- GitHub OAuth 部分 -->
+    <div id="auth-container" style="display: none;">
+        <div class="github-auth-container">
+            <div style="font-size: 2rem; color: #6751b9; margin-bottom: 20px;">
+                <i class="fa fa-github"></i>
+            </div>
+            <h2 style="margin-bottom: 10px;">GitHub 授权</h2>
+            <p style="color: #a0aec0; margin-bottom: 30px;">
+                需要 GitHub 授权来管理你的数据<br>
+                数据将存储在你的 GitHub Issues 中
+            </p>
+            <button class="auth-btn" onclick="githubLogin()">
+                <i class="fa fa-github"></i> 使用 GitHub 登录
+            </button>
+            <p style="font-size: 12px; color: #a0aec0; margin-top: 20px;">
+                授权后，你可以在你的 GitHub 仓库的 Issues 中查看所有数据
+            </p>
+        </div>
+    </div>
+
+    <!-- 主应用界面 -->
+    <div id="app-container" style="display: none;">
+        <div id="body-wrap">
+            <!-- 导航栏 -->
+            <nav>
+                <div id="site-title">
+                    <span class="blogtitle">后台管理 | 百夜</span>
+                </div>
+                <div style="position: absolute; top: 10px; right: 20px;">
+                    <div class="user-info" id="user-info">
+                        <!-- 用户信息将通过JS动态生成 -->
+                    </div>
+                </div>
+            </nav>
+
+            <!-- 主要内容区域 -->
+            <div class="layout_container">
+                <!-- 侧边栏 -->
+                <div class="aside_content">
+                    <!-- 个人资料卡片 -->
+                    <div class="card profile-card">
+                        <!-- 保持原样 -->
+                    </div>
+
+                    <!-- 心情编辑卡片 -->
+                    <div class="card mood-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                            <h3 class="card-title">今日心情</h3>
+                        </div>
+                        <div 
+                            class="mood-content" 
+                            id="mood-editor" 
+                            contenteditable="true"
+                            data-placeholder="记录今天的心情..."
+                        >记录今天的心情...</div>
+                        <div class="mood-actions">
+                            <button class="mood-btn" onclick="clearMood()">清空</button>
+                            <button class="mood-btn mood-btn-primary" onclick="saveMood()">
+                                <i class="fa fa-save"></i> 保存心情
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 统计数据卡片 -->
+                    <div class="card">
+                        <!-- 保持原样 -->
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main_content">
+                    <!-- 番茄钟功能卡片 -->
+                    <div class="card pomodoro-card">
+                        <!-- 番茄钟计时器功能 -->
+                        <!-- 保持原有的番茄钟HTML结构 -->
+                        <div class="controls-grid">
+                            <button class="btn btn-primary" id="start-btn">
+                                <i class="fa fa-play"></i> 开始专注
+                            </button>
+                            <button class="btn btn-secondary" id="pause-btn" style="display:none">
+                                <i class="fa fa-pause"></i> 暂停
+                            </button>
+                            <!-- 其他按钮 -->
+                        </div>
+                    </div>
+
+                    <!-- 想法发布卡片 -->
+                    <div class="card thoughts-card">
+                        <div class="thought-input-container">
+                            <textarea class="thought-input" id="new-thought" 
+                                placeholder="分享你的想法..."></textarea>
+                            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                <button class="btn btn-primary" id="post-thought">
+                                    <i class="fa fa-paper-plane"></i> 发布想法
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 想法列表 -->
+                        <div class="thoughts-list" id="thoughts-list">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <div id="footer-wrap">
+                    <div class="copyright">&copy; 2023 百夜 | 数据存储于 GitHub Issues</div>
+                    <div style="margin-top: 10px;">
+                        <a href="index.html" class="btn btn-secondary btn-small" 
+                           style="text-decoration: none; margin-right: 10px;">
+                            <i class="fa fa-eye"></i> 查看前台
+                        </a>
+                        <button class="btn btn-secondary btn-small" onclick="syncAllData()">
+                            <i class="fa fa-refresh"></i> 同步数据
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 同步状态提示 -->
+        <div id="sync-status" class="sync-status" style="display: none;">
+            <i class="fa fa-circle-o-notch fa-spin"></i> 同步中...
+        </div>
+    </div>
+
+    <script>
+        // GitHub OAuth 配置
+        const GITHUB_CONFIG = {
+            clientId: 'YOUR_CLIENT_ID',
+            redirectUri: window.location.origin + window.location.pathname,
+            scope: 'repo', // 需要 repo 权限来操作 Issues
+            state: 'github_auth_' + Math.random().toString(36).substr(2)
+        };
+
+        // 检查授权状态
+        function checkAuth() {
+            const token = localStorage.getItem('github_access_token');
+            const user = localStorage.getItem('github_user');
+            
+            if (token && user) {
+                // 已授权，显示主界面
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                displayUserInfo(JSON.parse(user));
+                initializeApp();
+            } else {
+                // 未授权，显示登录界面
+                document.getElementById('auth-container').style.display = 'block';
+                document.getElementById('app-container').style.display = 'none';
+                
+                // 检查 URL 中是否有授权码
+                const code = getQueryParam('code');
+                if (code) {
+                    exchangeCodeForToken(code);
+                }
+            }
+        }
+
+        // 获取 URL 参数
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // GitHub 登录
+        function githubLogin() {
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}&scope=${GITHUB_CONFIG.scope}&state=${GITHUB_CONFIG.state}`;
+            window.location.href = authUrl;
+        }
+
+        // 用 code 交换 token
+        async function exchangeCodeForToken(code) {
+            // 注意：在生产环境中，这个请求应该通过你的后端服务器进行
+            // 因为客户端 secret 不能暴露在前端代码中
+            // 这里为了简化，直接在前端进行（仅适用于公开仓库）
+            
+            try {
+                // 这里需要你的后端接口来处理 OAuth
+                // 你可以使用 GitHub Pages + Cloudflare Workers 或 Vercel 等无服务器函数
+                // 由于代码限制，这里省略具体实现
+                
+                // 临时方案：使用 GitHub 的 device flow 或让用户手动输入 token
+                alert('请配置 OAuth 后端服务器。\n\n临时方案：在 GitHub 生成 Personal Access Token，然后：\n\nlocalStorage.setItem("github_access_token", "你的token")');
+                
+                // 清理 URL 中的 code
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+            } catch (error) {
+                console.error('获取 token 失败:', error);
+            }
+        }
+
+        // 显示用户信息
+        function displayUserInfo(user) {
+            const userInfoDiv = document.getElementById('user-info');
+            userInfoDiv.innerHTML = `
+                <img src="${user.avatar_url}" class="user-avatar" alt="${user.login}">
+                <div>
+                    <div style="font-weight: bold;">${user.name || user.login}</div>
+                    <div style="font-size: 12px; color: #a0aec0;">${user.login}</div>
+                </div>
+                <button class="btn btn-secondary btn-small" onclick="logout()" style="margin-left: auto;">
+                    <i class="fa fa-sign-out"></i>
+                </button>
+            `;
+        }
+
+        // 登出
+        function logout() {
+            localStorage.removeItem('github_access_token');
+            localStorage.removeItem('github_user');
+            window.location.reload();
+        }
+
+        // 应用初始化
+        function initializeApp() {
+            // 这里初始化你的番茄钟、想法发布等功能
+            // 使用前面定义的 GitHub API 函数来操作数据
+            
+            // 示例：加载已有数据
+            loadThoughts();
+            loadTodayMood();
+            
+            // 初始化事件监听
+            document.getElementById('post-thought').addEventListener('click', postThought);
+            
+            // 初始化番茄钟
+            initializePomodoro();
+        }
+
+        // 发布想法
+        async function postThought() {
+            const content = document.getElementById('new-thought').value.trim();
+            if (!content) {
+                alert('请输入想法内容');
+                return;
+            }
+            
+            try {
+                await createIssue(
+                    content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+                    JSON.stringify({ content }),
+                    [GITHUB_CONFIG.labels.thought]
+                );
+                
+                document.getElementById('new-thought').value = '';
+                showSyncStatus('想法发布成功', 'success');
+                loadThoughts(); // 重新加载列表
+            } catch (error) {
+                console.error('发布失败:', error);
+                showSyncStatus('发布失败', 'error');
+            }
+        }
+
+        // 保存心情
+        async function saveMood() {
+            const moodContent = document.getElementById('mood-editor').innerText.trim();
+            if (!moodContent || moodContent === '记录今天的心情...') {
+                alert('请输入心情内容');
+                return;
+            }
+            
+            try {
+                // 检查今天是否已有心情记录
+                const today = new Date().toISOString().split('T')[0];
+                const issues = await getIssues(GITHUB_CONFIG.labels.mood);
+                const todayMood = issues.find(issue => 
+                    new Date(issue.created_at).toISOString().split('T')[0] === today
+                );
+                
+                if (todayMood) {
+                    // 更新已有记录
+                    await updateIssue(todayMood.number, {
+                        body: moodContent
+                    });
+                } else {
+                    // 创建新记录
+                    await createIssue(
+                        `心情记录 - ${today}`,
+                        moodContent,
+                        [GITHUB_CONFIG.labels.mood]
+                    );
+                }
+                
+                showSyncStatus('心情保存成功', 'success');
+            } catch (error) {
+                console.error('保存心情失败:', error);
+                showSyncStatus('保存失败', 'error');
+            }
+        }
+
+        // 显示同步状态
+        function showSyncStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('sync-status');
+            statusDiv.innerHTML = '';
+            statusDiv.className = 'sync-status';
+            
+            if (type === 'success') {
+                statusDiv.classList.add('sync-success');
+                statusDiv.innerHTML = `<i class="fa fa-check"></i> ${message}`;
+            } else if (type === 'error') {
+                statusDiv.classList.add('sync-error');
+                statusDiv.innerHTML = `<i class="fa fa-exclamation-triangle"></i> ${message}`;
+            } else {
+                statusDiv.innerHTML = `<i class="fa fa-info-circle"></i> ${message}`;
+            }
+            
+            statusDiv.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 页面加载时检查授权
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>
