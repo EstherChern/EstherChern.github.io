@@ -1,148 +1,114 @@
 // js/main.js
-// 通用工具函数
+// Front page loader — exposes loadAllData() used in index.html
+// Assumes index.html may set a global CONFIG = { repoOwner, repoName }
 
-// 显示消息
-function showMessage(message, type = 'info', duration = 3000) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
-    messageDiv.textContent = message;
-    messageDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        background: ${type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 
-                     type === 'success' ? 'rgba(16, 185, 129, 0.9)' : 
-                     'rgba(103, 81, 185, 0.9)'};
-        color: white;
-        z-index: 9999;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        animation: slideIn 0.3s ease-out;
-    `;
-    
-    document.body.appendChild(messageDiv);
-    
-    setTimeout(() => {
-        messageDiv.style.animation = 'slideOut 0.3s ease-in';
-        setTimeout(() => {
-            messageDiv.remove();
-        }, 300);
-    }, duration);
-}
+(function () {
+    // try to get CONFIG from page, else fallback
+    const PAGE_CONFIG = window.CONFIG || { repoOwner: 'EstherChern', repoName: 'EstherChern.github.io' };
 
-// 动画 keyframes
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
+    // global
+    window.githubAPI = new GitHubAPI(null, PAGE_CONFIG.repoOwner, PAGE_CONFIG.repoName);
+
+    async function loadAllData() {
+        try {
+            console.log('front: loadAllData start');
+            await Promise.all([
+                loadTodayMood(),
+                loadThoughts(),
+                loadPomodoroData(),
+                loadStatistics()
+            ]);
+            console.log('front: loadAllData done');
+        } catch (err) {
+            console.error('front loadAllData error:', err);
         }
     }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
+
+    async function loadTodayMood() {
+        try {
+            const m = await window.githubAPI.getTodayMood();
+            const moodDisplay = document.getElementById('mood-display');
+            if (!moodDisplay) return;
+            if (!m) {
+                moodDisplay.innerHTML = '<div class="mood-content" style="color:#a0aec0; font-style: italic;">今天还没有记录心情</div>';
+                moodDisplay.classList.remove('loading');
+                return;
+            }
+            const html = `<div class="mood-content">${(m.body || '').replace(/\n/g, '<br>')}</div>`;
+            moodDisplay.innerHTML = html;
+            moodDisplay.classList.remove('loading');
+        } catch (err) {
+            console.error('loadTodayMood error:', err);
+            const moodDisplay = document.getElementById('mood-display');
+            if (moodDisplay) {
+                moodDisplay.innerHTML = '<div class="mood-content" style="color:#ef4444">加载心情失败</div>';
+                moodDisplay.classList.remove('loading');
+            }
         }
     }
-`;
-document.head.appendChild(style);
 
-// 防抖函数
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// 节流函数
-function throttle(func, limit) {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
+    async function loadThoughts() {
+        try {
+            const thoughts = await window.githubAPI.getIssues({ labels: ['thought', 'personal-blog'], per_page: 10 });
+            const containerId = 'thoughts-list';
+            if (window.thoughtsManager && typeof window.thoughtsManager.displayThoughts === 'function') {
+                window.thoughtsManager.displayThoughts(thoughts, containerId);
+            } else {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                if (!thoughts || thoughts.length === 0) {
+                    el.innerHTML = '<div class="empty-info">还没有想法记录</div>';
+                } else {
+                    el.innerHTML = thoughts.map(t => `<div class="thought-item">${(t.body||'').slice(0,200)}</div>`).join('');
+                }
+            }
+        } catch (err) {
+            console.error('loadThoughts error:', err);
+            const el = document.getElementById('thoughts-list');
+            if (el) el.innerHTML = '<div class="empty-info">加载想法失败</div>';
         }
-    };
-}
-
-// 安全解析 JSON
-function safeParseJSON(str, defaultValue = {}) {
-    try {
-        return JSON.parse(str);
-    } catch (e) {
-        console.error('JSON 解析失败:', e);
-        return defaultValue;
     }
-}
 
-// 格式化字节大小
-function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
+    async function loadPomodoroData() {
+        try {
+            const pomodoros = await window.githubAPI.getIssues({ labels: ['pomodoro', 'personal-blog'], per_page: 50 });
+            const today = new Date().toISOString().split('T')[0];
+            const todayRecords = pomodoros.filter(issue => {
+                try {
+                    const d = new Date(issue.created_at).toISOString().split('T')[0];
+                    return d === today;
+                } catch { return false; }
+            });
 
-// 获取 URL 参数
-function getQueryParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
+            const historyList = document.getElementById('history-list');
+            if (!historyList) return;
+            if (!todayRecords || todayRecords.length === 0) {
+                historyList.innerHTML = '<div class="history-item">今天还没有记录</div>';
+            } else {
+                historyList.innerHTML = todayRecords.slice(0,5).map(issue => {
+                    const time = new Date(issue.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                    return `<div class="history-item"><i class="fa fa-check-circle" style="color:#4ade80; margin-right:8px;"></i>${time} - 完成25分钟专注</div>`;
+                }).join('');
+            }
+        } catch (err) {
+            console.error('loadPomodoroData error:', err);
+            const historyList = document.getElementById('history-list');
+            if (historyList) historyList.innerHTML = '<div class="history-item">加载失败</div>';
+        }
+    }
 
-// 设置 URL 参数
-function setQueryParam(name, value) {
-    const url = new URL(window.location);
-    url.searchParams.set(name, value);
-    window.history.replaceState({}, '', url);
-}
+    async function loadStatistics() {
+        try {
+            // placeholder: extend later
+        } catch (err) {
+            console.error('loadStatistics error:', err);
+        }
+    }
 
-// 移除 URL 参数
-function removeQueryParam(name) {
-    const url = new URL(window.location);
-    url.searchParams.delete(name);
-    window.history.replaceState({}, '', url);
-}
-
-// 复制到剪贴板
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        showMessage('已复制到剪贴板', 'success');
-    }).catch(err => {
-        console.error('复制失败:', err);
-        showMessage('复制失败', 'error');
-    });
-}
-
-// 导出所有函数
-window.showMessage = showMessage;
-window.debounce = debounce;
-window.throttle = throttle;
-window.safeParseJSON = safeParseJSON;
-window.formatBytes = formatBytes;
-window.getQueryParam = getQueryParam;
-window.setQueryParam = setQueryParam;
-window.removeQueryParam = removeQueryParam;
-window.copyToClipboard = copyToClipboard;
+    // expose
+    window.loadAllData = loadAllData;
+    window.loadTodayMood = loadTodayMood;
+    window.loadThoughts = loadThoughts;
+    window.loadPomodoroData = loadPomodoroData;
+    window.loadStatistics = loadStatistics;
+})();
