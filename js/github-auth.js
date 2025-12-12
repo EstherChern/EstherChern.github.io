@@ -20,11 +20,8 @@ function checkAuthStatus() {
 
 // GitHub 登录
 function githubLogin() {
-    const authUrl =
-        `https://github.com/login/oauth/authorize` +
-        `?client_id=${GITHUB_CONFIG.clientId}` +
-        `&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}` +
-        `&scope=repo`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(window.location.href)}&scope=repo%20user`;
+
 
     window.location.href = authUrl;
 }
