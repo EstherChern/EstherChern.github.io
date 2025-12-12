@@ -1,0 +1,8 @@
+{
+  "name": "github-issues-blog",
+  "version": "1.0.0",
+  "description": "使用 GitHub Issues 的个人博客",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
