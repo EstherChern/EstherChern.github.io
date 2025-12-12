@@ -3,12 +3,19 @@
 // NOTE: keep clientId as your app's client id and apiEndpoint as your vercel endpoint.
 
 const GITHUB_CONFIG = {
-    clientId: 'Ov23liVfqw48OFq76vWI', // 你的 client id（保持原值或替换）
-    // 固定回调到 admin.html（与 GitHub OAuth App 中设置一致）
-    redirectUri: 'https://estherchern.github.io/admin.html',
+    // 使用你自己的GitHub OAuth App Client ID
+    // 创建地址：https://github.com/settings/developers
+    clientId: 'Ov23liVfqw48OFq76vWI', // 替换为你的Client ID
+    
+    // 回调地址必须与GitHub OAuth App设置中的完全一致
+    redirectUri: window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000/admin.html'  // 本地开发
+        : 'https://estherchern.github.io/admin.html', // 线上地址
+    
+    // Vercel API地址，确保你的后端API已部署
     apiEndpoint: window.location.hostname === 'localhost'
         ? 'http://localhost:3000/api/github-auth'
-        : 'https://esther-ivory-three.vercel.app/api/github-auth'
+        : 'https://esther-ivory-three.vercel.app/api/github-auth'  // 替换为你的Vercel域名
 };
 
 // 检查登录状态
