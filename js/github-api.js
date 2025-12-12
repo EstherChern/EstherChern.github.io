@@ -1,221 +1,170 @@
 // js/github-api.js
+// Simple GitHub API helper used by front & admin.
+// Usage:
+//   const api = new GitHubAPI(tokenOrNull, owner, repo);
+//   await api.getIssues({ labels: ['thought'], per_page: 20 });
+//   await api.postIssue({ title, body, labels });
+
 class GitHubAPI {
-    constructor(token, username, repo) {
+    constructor(token = null, owner = '', repo = '') {
         this.token = token;
-        this.username = username;
+        this.owner = owner;
         this.repo = repo;
-        this.baseURL = 'https://api.github.com';
+        this.base = 'https://api.github.com';
     }
 
-    async request(endpoint, options = {}) {
-        const url = `${this.baseURL}${endpoint}`;
-        
+    setToken(token) {
+        this.token = token;
+    }
+
+    setRepo(owner, repo) {
+        this.owner = owner;
+        this.repo = repo;
+    }
+
+    getHeaders() {
         const headers = {
-            'Accept': 'application/vnd.github.v3+json',
-            ...options.headers
+            'Accept': 'application/vnd.github.v3+json'
         };
-        
-        // 如果有访问令牌，添加到请求头
-        if (this.token) {
-            headers['Authorization'] = `token ${this.token}`;
-        }
-        
+        if (this.token) headers['Authorization'] = 'token ' + this.token;
+        return headers;
+    }
+
+    // Get repositories for the authenticated user
+    async getUserRepos() {
         try {
-            const response = await fetch(url, {
-                ...options,
-                headers
+            const res = await fetch(`${this.base}/user/repos?per_page=100`, {
+                headers: this.getHeaders()
             });
-
-            // 处理错误状态
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}`);
+            if (!res.ok) {
+                console.warn('getUserRepos failed:', res.status, await res.text());
+                return [];
             }
-
-            return response.json();
-        } catch (error) {
-            console.error('GitHub API 请求失败:', error);
-            throw error;
+            const json = await res.json();
+            return Array.isArray(json) ? json : [];
+        } catch (err) {
+            console.error('getUserRepos error:', err);
+            return [];
         }
     }
 
-    // 测试连接
+    // Generic issues fetch with safe fallback
+    // params: { labels: ['a','b'], state: 'all', per_page: 20 }
+    async getIssues(params = {}) {
+        if (!this.owner || !this.repo) {
+            console.warn('getIssues: owner/repo not specified');
+            return [];
+        }
+
+        const qs = new URLSearchParams({
+            state: params.state || 'all',
+            per_page: params.per_page || 20
+        });
+
+        if (params.labels && Array.isArray(params.labels)) {
+            qs.set('labels', params.labels.join(','));
+        }
+
+        try {
+            const url = `${this.base}/repos/${this.owner}/${this.repo}/issues?${qs.toString()}`;
+            const res = await fetch(url, { headers: this.getHeaders() });
+            if (!res.ok) {
+                console.warn('getIssues non-ok:', res.status, await res.text());
+                return [];
+            }
+            const json = await res.json();
+            return Array.isArray(json) ? json : [];
+        } catch (err) {
+            console.error('getIssues error:', err);
+            return [];
+        }
+    }
+
+    // Get "today mood" - find an issue titled with today's date or label mood
+    async getTodayMood() {
+        if (!this.owner || !this.repo) return null;
+        try {
+            const issues = await this.getIssues({ labels: ['mood', 'personal-blog'], per_page: 50 });
+            if (!Array.isArray(issues) || issues.length === 0) return null;
+            const today = new Date().toISOString().split('T')[0];
+            // prefer title containing date, else return most recent
+            const match = issues.find(i => i.title && i.title.includes(today));
+            return match || issues[0] || null;
+        } catch (err) {
+            console.error('getTodayMood error:', err);
+            return null;
+        }
+    }
+
+    // Create a new issue (used by thoughts, pomodoro, mood save)
+    async postIssue({ title, body = '', labels = [] }) {
+        if (!this.owner || !this.repo) throw new Error('owner/repo not set');
+        if (!this.token) throw new Error('No token for write operation');
+
+        try {
+            const url = `${this.base}/repos/${this.owner}/${this.repo}/issues`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: Object.assign({ 'Content-Type': 'application/json' }, this.getHeaders()),
+                body: JSON.stringify({ title, body, labels })
+            });
+            const json = await res.json();
+            if (!res.ok) {
+                console.warn('postIssue failed', res.status, json);
+                throw new Error(json.message || 'GitHub issue create failed');
+            }
+            return json;
+        } catch (err) {
+            console.error('postIssue error:', err);
+            throw err;
+        }
+    }
+
+    // Helpers for specific actions
+    async postThought(content) {
+        const title = `Thought ${new Date().toISOString()}`;
+        return this.postIssue({ title, body: content, labels: ['thought', 'personal-blog'] });
+    }
+
+    async saveTodayMood(content) {
+        const today = new Date().toISOString().split('T')[0];
+        const title = `Mood ${today}`;
+        return this.postIssue({ title, body: content, labels: ['mood', 'personal-blog'] });
+    }
+
+    async postPomodoro() {
+        const title = `Pomodoro ${new Date().toISOString()}`;
+        const body = '完成 25 分钟专注';
+        return this.postIssue({ title, body, labels: ['pomodoro', 'personal-blog'] });
+    }
+
+    // Test connection by fetching the authenticated user (if token) or public repo info (if no token)
     async testConnection() {
         try {
-            const user = await this.request('/user');
-            const repo = await this.request(`/repos/${this.username}/${this.repo}`);
-            return {
-                success: true,
-                user: user.login,
-                repo: repo.name
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    }
-
-    // 创建 Issue
-    async createIssue(title, body, labels = []) {
-        return this.request(`/repos/${this.username}/${this.repo}/issues`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                title, 
-                body, 
-                labels: [...labels, 'personal-blog']
-            })
-        });
-    }
-
-    // 获取 Issues
-    async getIssues(params = {}) {
-        let endpoint = `/repos/${this.username}/${this.repo}/issues`;
-        const queryParams = [];
-        
-        if (params.labels && params.labels.length > 0) {
-            queryParams.push(`labels=${params.labels.join(',')}`);
-        }
-        if (params.state) {
-            queryParams.push(`state=${params.state}`);
-        }
-        if (params.per_page) {
-            queryParams.push(`per_page=${params.per_page}`);
-        }
-        if (params.page) {
-            queryParams.push(`page=${params.page}`);
-        }
-        if (params.sort) {
-            queryParams.push(`sort=${params.sort}`);
-        }
-        if (params.direction) {
-            queryParams.push(`direction=${params.direction}`);
-        }
-        
-        if (queryParams.length > 0) {
-            endpoint += `?${queryParams.join('&')}`;
-        }
-        
-        return this.request(endpoint);
-    }
-
-    // 获取用户的所有仓库
-    async getUserRepos() {
-        return this.request('/user/repos?per_page=100&sort=updated');
-    }
-
-    // 获取今日心情
-    async getTodayMood() {
-        const today = new Date().toISOString().split('T')[0];
-        const issues = await this.getIssues({ 
-            labels: ['mood', 'personal-blog'],
-            per_page: 100,
-            sort: 'created',
-            direction: 'desc'
-        });
-        
-        // 查找今天的心情（最近的）
-        for (const issue of issues) {
-            const issueDate = new Date(issue.created_at).toISOString().split('T')[0];
-            if (issueDate === today) {
-                return issue;
+            if (this.token) {
+                const res = await fetch(`${this.base}/user`, { headers: this.getHeaders() });
+                if (!res.ok) {
+                    return { success: false, error: `User fetch failed ${res.status}` };
+                }
+                const user = await res.json();
+                return { success: true, user: user.login || user.name || user };
+            } else {
+                // no token: check if repo is public
+                if (!this.owner || !this.repo) return { success: false, error: 'no repo specified' };
+                const res = await fetch(`${this.base}/repos/${this.owner}/${this.repo}`);
+                if (!res.ok) {
+                    return { success: false, error: `Repo fetch failed ${res.status}` };
+                }
+                const repo = await res.json();
+                return { success: true, repo: repo.full_name || repo.name };
             }
-        }
-        return null;
-    }
-
-    // 保存今日心情
-    async saveTodayMood(content) {
-        const todayMood = await this.getTodayMood();
-        
-        if (todayMood) {
-            // 更新已有心情
-            return this.updateIssue(todayMood.number, { body: content });
-        } else {
-            // 创建新心情
-            const today = new Date().toLocaleDateString('zh-CN');
-            return this.createIssue(`心情记录 - ${today}`, content, ['mood']);
+        } catch (err) {
+            console.error('testConnection error:', err);
+            return { success: false, error: err.message || 'unknown' };
         }
     }
 
-    // 发布想法
-    async postThought(content, images = []) {
-        const timestamp = new Date().toLocaleString('zh-CN');
-        const thoughtData = {
-            content,
-            timestamp,
-            images,
-            type: 'thought'
-        };
-        
-        const title = content.length > 50 
-            ? content.substring(0, 47) + '...' 
-            : content;
-        
-        return this.createIssue(title, JSON.stringify(thoughtData, null, 2), ['thought']);
-    }
-
-    // 记录番茄钟完成
-    async recordPomodoro(duration = 25, type = 'work') {
-        const timestamp = new Date().toLocaleString('zh-CN');
-        const pomodoroData = {
-            duration,
-            timestamp,
-            type,
-            completed: true
-        };
-        
-        const title = `番茄钟完成 - ${type === 'work' ? '专注' : '休息'} ${duration}分钟`;
-        return this.createIssue(title, JSON.stringify(pomodoroData), ['pomodoro']);
-    }
-
-    // 获取统计数据
-    async getStatistics() {
-        const [thoughts, pomodoros, moods] = await Promise.all([
-            this.getIssues({ labels: ['thought', 'personal-blog'], state: 'all', per_page: 1 }),
-            this.getIssues({ labels: ['pomodoro', 'personal-blog'], state: 'all', per_page: 1 }),
-            this.getIssues({ labels: ['mood', 'personal-blog'], state: 'all', per_page: 1 })
-        ]);
-        
-        return {
-            thoughts: thoughts.length,
-            pomodoros: pomodoros.length,
-            moods: moods.length
-        };
-    }
-
-    // 更新 Issue
-    async updateIssue(issueNumber, updates) {
-        return this.request(`/repos/${this.username}/${this.repo}/issues/${issueNumber}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updates)
-        });
-    }
-
-    // 关闭 Issue
-    async closeIssue(issueNumber) {
-        return this.updateIssue(issueNumber, { state: 'closed' });
-    }
-
-    // 重新打开 Issue
-    async reopenIssue(issueNumber) {
-        return this.updateIssue(issueNumber, { state: 'open' });
-    }
-
-    // 删除 Issue（GitHub API 不支持直接删除，只能关闭）
-    async deleteIssue(issueNumber) {
-        return this.closeIssue(issueNumber);
-    }
 }
 
-// 导出给其他文件使用
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = GitHubAPI;
-}
+// expose globally
+window.GitHubAPI = GitHubAPI;
