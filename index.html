@@ -9,9 +9,12 @@
     <meta name="keywords" content="个人博客,开发者,数学,编程,二次元">
     <meta name="format-detection" content="telephone=no">
     <link rel="shortcut icon" href="favicon.ico">
+
+    <!-- ====== 替换后的 CSS CDN（全部可在 Edge 正常加载） ====== -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css">
+
     <link rel="stylesheet" href="assets/css/style.css">
     
     <!-- 前台特有样式 -->
@@ -58,7 +61,6 @@
         <div class="layout_container">
             <!-- 侧边栏：个人资料卡片 -->
             <div class="aside_content">
-                <!-- 个人资料卡片 -->
                 <div class="card profile-card">
                     <div class="profile-avatar">
                         <img src="https://images3.alphacoders.com/135/thumb-1920-1358482.png" alt="头像">
@@ -131,7 +133,6 @@
 
             <!-- 主内容区域 -->
             <div class="main_content">
-                <!-- 音乐播放器卡片 -->
                 <div class="card music-card">
                     <div class="card-header">
                         <div class="card-icon">
@@ -142,7 +143,7 @@
                     <div id="aplayer"></div>
                 </div>
 
-                <!-- 番茄钟卡片（只显示） -->
+                <!-- 番茄钟卡片 -->
                 <div class="card pomodoro-card">
                     <div class="pomodoro-header">
                         <div class="card-header">
@@ -169,7 +170,7 @@
                     </div>
                 </div>
 
-                <!-- 想法卡片（只显示） -->
+                <!-- 想法卡片 -->
                 <div class="card thoughts-card">
                     <div class="card-header">
                         <div class="card-icon">
@@ -212,12 +213,12 @@
         </div>
     </div>
 
-    <!-- 外部 JS 库 -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+    <!-- ====== 替换后的 JS CDN ====== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
+    <script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js"></script>
     
     <!-- 项目 JS 文件 -->
     <script src="js/github-api.js"></script>
@@ -225,20 +226,17 @@
     <script src="js/thoughts.js"></script>
     <script src="js/pomodoro.js"></script>
     
-    <!-- 前台页面初始化 -->
+    <!-- 初始化逻辑 -->
     <script>
-        // 配置
         const CONFIG = {
             repoOwner: 'EstherChern',
             repoName: 'EstherChern.github.io'
         };
         
-        // 全局变量
         let githubAPI = null;
         let currentUser = null;
         
         $(document).ready(function() {
-            // 初始化动态标题
             var typed = new Typed(".blogtitle", {
                 strings: ['百夜 | 学术与二次元', '百夜 | 数学与编程', '百夜 | 专注与创造'],
                 startDelay: 300,
@@ -248,7 +246,6 @@
                 showCursor: true
             });
             
-            // 初始化音乐播放器
             const ap = new APlayer({
                 container: document.getElementById('aplayer'),
                 audio: [{
@@ -264,17 +261,13 @@
                 theme: '#6751b9'
             });
             
-            // 加载数据
             loadAllData();
         });
-        
-        // 加载所有数据
+
         async function loadAllData() {
             try {
-                // 使用公共 GitHub API（无需认证）
                 githubAPI = new GitHubAPI(null, CONFIG.repoOwner, CONFIG.repoName);
                 
-                // 并行加载所有数据
                 await Promise.all([
                     loadTodayMood(),
                     loadThoughts(),
@@ -289,7 +282,6 @@
             }
         }
         
-        // 加载今日心情
         async function loadTodayMood() {
             try {
                 const todayMood = await githubAPI.getTodayMood();
@@ -305,7 +297,6 @@
             }
         }
         
-        // 加载想法
         async function loadThoughts() {
             try {
                 const thoughts = await githubAPI.getIssues({ 
@@ -319,7 +310,6 @@
             }
         }
         
-        // 加载番茄钟数据
         async function loadPomodoroData() {
             try {
                 const today = new Date().toISOString().split('T')[0];
@@ -353,10 +343,8 @@
                     historyList.innerHTML = html;
                 }
                 
-                // 更新统计数据
                 document.getElementById('total-pomodoro').textContent = pomodoros.length;
                 
-                // 计算今日专注时间
                 const todayFocusMinutes = todayRecords.length * 25;
                 const todayHours = Math.floor(todayFocusMinutes / 60);
                 const todayMinutes = todayFocusMinutes % 60;
@@ -368,17 +356,14 @@
             }
         }
         
-        // 加载统计数据
         async function loadStatistics() {
             try {
-                // 这里可以添加更多统计数据的计算
-                // 比如连续天数等
+                // 可扩展未来功能
             } catch (error) {
-                console.error('加载统计数据失败:', error);
+                console.error('加载统计失败:', error);
             }
         }
         
-        // 显示消息
         function showMessage(message, type = 'info') {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
