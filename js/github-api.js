@@ -190,6 +190,36 @@ async getIssues(params = {}) {
     }
 
 }
+// 添加 getStatistics 方法到 GitHubAPI 类中
+async getStatistics() {
+    try {
+        // 并行获取各种类型的issue数量
+        const [thoughts, pomodoros, moods] = await Promise.allSettled([
+            this.getIssues({ labels: ['thought', 'personal-blog'], state: 'all', per_page: 1 }),
+            this.getIssues({ labels: ['pomodoro', 'personal-blog'], state: 'all', per_page: 1 }),
+            this.getIssues({ labels: ['mood', 'personal-blog'], state: 'all', per_page: 1 })
+        ]);
 
+        return {
+            thoughts: thoughts.status === 'fulfilled' && Array.isArray(thoughts.value) 
+                ? thoughts.value.length 
+                : 0,
+            pomodoros: pomodoros.status === 'fulfilled' && Array.isArray(pomodoros.value) 
+                ? pomodoros.value.length 
+                : 0,
+            moods: moods.status === 'fulfilled' && Array.isArray(moods.value) 
+                ? moods.value.length 
+                : 0
+        };
+        
+    } catch (error) {
+        console.error('获取统计数据失败:', error);
+        return {
+            thoughts: 0,
+            pomodoros: 0,
+            moods: 0
+        };
+    }
+}
 // expose globally
 window.GitHubAPI = GitHubAPI;
