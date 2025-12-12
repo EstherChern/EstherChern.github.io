@@ -213,12 +213,10 @@
     <script>
         // GitHub OAuth 配置
         const GITHUB_CONFIG = {
-            clientId: 'YOUR_CLIENT_ID',
-            redirectUri: window.location.origin + window.location.pathname,
-            scope: 'repo', // 需要 repo 权限来操作 Issues
-            state: 'github_auth_' + Math.random().toString(36).substr(2)
-        };
-
+    clientId: '你的_GITHUB_CLIENT_ID',  // 从 GitHub OAuth App 获取
+    redirectUri: '你的_VERCEL_URL/admin.html', // 例如：https://your-app.vercel.app/admin.html
+    apiEndpoint: '你的_VERCEL_URL/api/github-auth' // 例如：https://your-app.vercel.app/api/github-auth
+};
         // 检查授权状态
         function checkAuth() {
             const token = localStorage.getItem('github_access_token');
@@ -250,32 +248,37 @@
         }
 
         // GitHub 登录
-        function githubLogin() {
-            const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}&scope=${GITHUB_CONFIG.scope}&state=${GITHUB_CONFIG.state}`;
-            window.location.href = authUrl;
-        }
+       function githubLogin() {
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}&scope=repo`;
+    window.location.href = authUrl;
+}
 
         // 用 code 交换 token
-        async function exchangeCodeForToken(code) {
-            // 注意：在生产环境中，这个请求应该通过你的后端服务器进行
-            // 因为客户端 secret 不能暴露在前端代码中
-            // 这里为了简化，直接在前端进行（仅适用于公开仓库）
+       async function exchangeCodeForToken(code) {
+    try {
+        // 调用我们的无服务器函数
+        const response = await fetch(`${GITHUB_CONFIG.apiEndpoint}?code=${code}`);
+        const data = await response.json();
+        
+        if (data.access_token) {
+            // 保存 token 和用户信息
+            localStorage.setItem('github_access_token', data.access_token);
+            localStorage.setItem('github_user', JSON.stringify(data.user));
             
-            try {
-                // 这里需要你的后端接口来处理 OAuth
-                // 你可以使用 GitHub Pages + Cloudflare Workers 或 Vercel 等无服务器函数
-                // 由于代码限制，这里省略具体实现
-                
-                // 临时方案：使用 GitHub 的 device flow 或让用户手动输入 token
-                alert('请配置 OAuth 后端服务器。\n\n临时方案：在 GitHub 生成 Personal Access Token，然后：\n\nlocalStorage.setItem("github_access_token", "你的token")');
-                
-                // 清理 URL 中的 code
-                window.history.replaceState({}, document.title, window.location.pathname);
-                
-            } catch (error) {
-                console.error('获取 token 失败:', error);
-            }
+            // 清除 URL 中的 code 参数
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // 重新加载页面
+            window.location.reload();
+        } else {
+            throw new Error(data.error || 'Authentication failed');
         }
+    } catch (error) {
+        console.error('获取 token 失败:', error);
+        alert('授权失败: ' + error.message);
+    }
+}
+
 
         // 显示用户信息
         function displayUserInfo(user) {
@@ -401,7 +404,19 @@
         }
 
         // 页面加载时检查授权
-        document.addEventListener('DOMContentLoaded', checkAuth);
+        document.addEventListener('DOMContentLoaded', function() {
+    // 检查 URL 中是否有授权码
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+        // 有授权码，进行交换
+        exchangeCodeForToken(code);
+    } else {
+        // 没有授权码，检查是否已登录
+        checkAuth();
+    }
+});
     </script>
 </body>
 </html>
