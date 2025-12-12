@@ -5,97 +5,235 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
     <title>后台管理 | 百夜</title>
-    <!-- 保持所有CSS样式相同 -->
-    <!-- 添加一些管理界面特有的样式 -->
+    <meta name="description" content="SYSU数学系大三在读，二次元爱好者，技术博客">
+    <meta name="keywords" content="个人博客,开发者,数学,编程,二次元">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+    
+    <!-- 保持原CSS不变，添加一些管理界面特有的样式 -->
     <style>
-        .github-auth-container {
+        /* 原有CSS保持不变，添加以下新样式 */
+        
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .github-auth-card {
             max-width: 400px;
-            margin: 50px auto;
-            padding: 40px;
-            background: rgba(25, 30, 40, 0.9);
-            border-radius: 12px;
+            width: 100%;
+            background: rgba(25, 30, 40, 0.95);
+            border-radius: 16px;
+            padding: 40px 30px;
             text-align: center;
             border: 1px solid rgba(103, 81, 185, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .auth-icon {
+            font-size: 4rem;
+            color: #6751b9;
+            margin-bottom: 20px;
+        }
+        
+        .auth-title {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        .auth-subtitle {
+            color: #a0aec0;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
         
         .auth-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            padding: 12px 24px;
+            width: 100%;
+            padding: 15px 30px;
             background: #24292e;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
         
         .auth-btn:hover {
             background: #2c3138;
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(36, 41, 46, 0.3);
         }
         
-        .user-info {
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+        
+        .auth-note {
+            font-size: 12px;
+            color: #a0aec0;
+            line-height: 1.5;
+        }
+        
+        .user-info-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: rgba(103, 81, 185, 0.1);
             padding: 10px 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            border: 1px solid rgba(103, 81, 185, 0.3);
         }
         
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            border: 2px solid rgba(103, 81, 185, 0.5);
         }
         
         .sync-status {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(25, 30, 40, 0.9);
-            border: 1px solid rgba(103, 81, 185, 0.5);
-            border-radius: 8px;
-            padding: 10px 15px;
-            font-size: 12px;
+            background: rgba(25, 30, 40, 0.95);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 14px;
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid transparent;
+            transition: all 0.3s;
         }
         
-        .sync-success {
+        .sync-status.success {
             border-color: #10b981;
             color: #10b981;
         }
         
-        .sync-error {
+        .sync-status.error {
             border-color: #ef4444;
             color: #ef4444;
+        }
+        
+        .sync-status.warning {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 20, 30, 0.6);
+            color: #e8eaed;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .action-btn:hover {
+            background: rgba(103, 81, 185, 0.2);
+            border-color: rgba(103, 81, 185, 0.5);
+        }
+        
+        .data-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .data-stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(15, 20, 30, 0.6);
+            border-radius: 8px;
+        }
+        
+        .data-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #8a74f9;
+            margin-bottom: 5px;
+        }
+        
+        .data-stat-label {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+        
+        .repo-selector {
+            margin-top: 15px;
+        }
+        
+        .repo-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(15, 20, 30, 0.6);
+            border: 1px solid rgba(103, 81, 185, 0.3);
+            color: #e8eaed;
+            font-size: 14px;
+        }
+        
+        .repo-select:focus {
+            outline: none;
+            border-color: #6751b9;
         }
     </style>
 </head>
 
 <body>
-    <!-- GitHub OAuth 部分 -->
-    <div id="auth-container" style="display: none;">
-        <div class="github-auth-container">
-            <div style="font-size: 2rem; color: #6751b9; margin-bottom: 20px;">
+    <!-- 授权登录界面 -->
+    <div id="auth-container" class="auth-container" style="display: none;">
+        <div class="github-auth-card">
+            <div class="auth-icon">
                 <i class="fa fa-github"></i>
             </div>
-            <h2 style="margin-bottom: 10px;">GitHub 授权</h2>
-            <p style="color: #a0aec0; margin-bottom: 30px;">
+            <h2 class="auth-title">GitHub 授权</h2>
+            <p class="auth-subtitle">
                 需要 GitHub 授权来管理你的数据<br>
-                数据将存储在你的 GitHub Issues 中
+                数据将安全存储在你的 GitHub Issues 中
             </p>
             <button class="auth-btn" onclick="githubLogin()">
                 <i class="fa fa-github"></i> 使用 GitHub 登录
             </button>
-            <p style="font-size: 12px; color: #a0aec0; margin-top: 20px;">
-                授权后，你可以在你的 GitHub 仓库的 Issues 中查看所有数据
+            <p class="auth-note">
+                授权后，你可以在你的 GitHub 仓库 Issues 中<br>
+                查看和管理所有数据记录
             </p>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: #a0aec0; font-size: 12px; margin-bottom: 10px;">测试模式（开发用）：</p>
+                <button class="action-btn" onclick="useTestToken()">
+                    <i class="fa fa-key"></i> 使用测试 Token
+                </button>
+            </div>
         </div>
     </div>
 
@@ -108,7 +246,7 @@
                     <span class="blogtitle">后台管理 | 百夜</span>
                 </div>
                 <div style="position: absolute; top: 10px; right: 20px;">
-                    <div class="user-info" id="user-info">
+                    <div class="user-info-bar" id="user-info">
                         <!-- 用户信息将通过JS动态生成 -->
                     </div>
                 </div>
@@ -120,7 +258,72 @@
                 <div class="aside_content">
                     <!-- 个人资料卡片 -->
                     <div class="card profile-card">
-                        <!-- 保持原样 -->
+                        <div class="profile-avatar">
+                            <img src="https://images3.alphacoders.com/135/thumb-1920-1358482.png" alt="头像">
+                        </div>
+                        <h2 class="profile-name">摸鱼爱好者</h2>
+                        <p class="profile-bio">SYSU数学系大三在读<br>二次元爱好者 | 前端开发者<br>永远保持求知欲</p>
+                        
+                        <div class="profile-tags">
+                            <span class="tag">数学</span>
+                            <span class="tag">编程</span>
+                            <span class="tag">二次元</span>
+                            <span class="tag">动漫</span>
+                            <span class="tag">游戏</span>
+                        </div>
+                        
+                        <div class="social-links">
+                            <a href="https://github.com" class="social-link" target="_blank">
+                                <i class="fa fa-github"></i>
+                            </a>
+                            <a href="#" class="social-link" target="_blank">
+                                <i class="fa fa-weibo"></i>
+                            </a>
+                            <a href="#" class="social-link" target="_blank">
+                                <i class="fa fa-bilibili"></i>
+                            </a>
+                            <a href="#" class="social-link" target="_blank">
+                                <i class="fa fa-zhihu"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 仓库选择 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fa fa-database"></i>
+                            </div>
+                            <h3 class="card-title">数据仓库</h3>
+                        </div>
+                        <div class="repo-selector">
+                            <select class="repo-select" id="repo-select">
+                                <option value="">选择仓库...</option>
+                                <!-- 仓库列表将通过JS动态加载 -->
+                            </select>
+                        </div>
+                        <div class="data-stats">
+                            <div class="data-stat-item">
+                                <div class="data-stat-value" id="stats-thoughts">0</div>
+                                <div class="data-stat-label">想法记录</div>
+                            </div>
+                            <div class="data-stat-item">
+                                <div class="data-stat-value" id="stats-pomodoros">0</div>
+                                <div class="data-stat-label">番茄钟</div>
+                            </div>
+                            <div class="data-stat-item">
+                                <div class="data-stat-value" id="stats-moods">0</div>
+                                <div class="data-stat-label">心情记录</div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="loadAllData()">
+                                <i class="fa fa-refresh"></i> 刷新数据
+                            </button>
+                            <button class="action-btn" onclick="exportData()">
+                                <i class="fa fa-download"></i> 导出数据
+                            </button>
+                        </div>
                     </div>
 
                     <!-- 心情编辑卡片 -->
@@ -135,28 +338,48 @@
                             class="mood-content" 
                             id="mood-editor" 
                             contenteditable="true"
-                            data-placeholder="记录今天的心情..."
-                        >记录今天的心情...</div>
+                            data-placeholder="点击这里记录今天的心情..."
+                        >点击这里记录今天的心情...</div>
                         <div class="mood-actions">
-                            <button class="mood-btn" onclick="clearMood()">清空</button>
+                            <button class="mood-btn" onclick="clearMood()">
+                                <i class="fa fa-trash"></i> 清空
+                            </button>
                             <button class="mood-btn mood-btn-primary" onclick="saveMood()">
-                                <i class="fa fa-save"></i> 保存心情
+                                <i class="fa fa-save"></i> 保存到 GitHub
                             </button>
                         </div>
-                    </div>
-
-                    <!-- 统计数据卡片 -->
-                    <div class="card">
-                        <!-- 保持原样 -->
                     </div>
                 </div>
 
                 <!-- 主内容区 -->
                 <div class="main_content">
+                    <!-- 音乐播放器卡片 -->
+                    <div class="card music-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fa fa-music"></i>
+                            </div>
+                            <h3 class="card-title">学习音乐</h3>
+                        </div>
+                        <div id="aplayer"></div>
+                    </div>
+
                     <!-- 番茄钟功能卡片 -->
                     <div class="card pomodoro-card">
-                        <!-- 番茄钟计时器功能 -->
-                        <!-- 保持原有的番茄钟HTML结构 -->
+                        <div class="pomodoro-header">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                                <h3 class="card-title">学术番茄钟</h3>
+                            </div>
+                            <div class="timer-status" id="timer-status">准备开始</div>
+                        </div>
+                        
+                        <div class="pomodoro-timer">
+                            <div class="timer-display" id="timer-display">25:00</div>
+                        </div>
+                        
                         <div class="controls-grid">
                             <button class="btn btn-primary" id="start-btn">
                                 <i class="fa fa-play"></i> 开始专注
@@ -164,25 +387,76 @@
                             <button class="btn btn-secondary" id="pause-btn" style="display:none">
                                 <i class="fa fa-pause"></i> 暂停
                             </button>
-                            <!-- 其他按钮 -->
+                            <button class="btn btn-secondary" id="reset-btn">
+                                <i class="fa fa-refresh"></i> 重置
+                            </button>
+                            <button class="btn btn-secondary btn-small" id="short-break">
+                                <i class="fa fa-coffee"></i> 短休息
+                            </button>
+                            <button class="btn btn-secondary btn-small" id="long-break">
+                                <i class="fa fa-bed"></i> 长休息
+                            </button>
+                        </div>
+                        
+                        <div class="pomodoro-history">
+                            <h4 class="history-title">今日专注记录</h4>
+                            <div class="history-list" id="history-list">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>加载记录中...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 想法发布卡片 -->
                     <div class="card thoughts-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fa fa-pencil"></i>
+                            </div>
+                            <h3 class="card-title">发布想法</h3>
+                        </div>
+                        
                         <div class="thought-input-container">
-                            <textarea class="thought-input" id="new-thought" 
-                                placeholder="分享你的想法..."></textarea>
-                            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                                <button class="btn btn-primary" id="post-thought">
-                                    <i class="fa fa-paper-plane"></i> 发布想法
-                                </button>
+                            <img src="https://cdn.jsdelivr.net/gh/guoshijiang/picbed/2023/10/202310071352613.jpg" class="thought-avatar" alt="头像">
+                            <div style="flex: 1;">
+                                <textarea class="thought-input" id="new-thought" placeholder="分享你的想法、学习心得或有趣发现..."></textarea>
+                                
+                                <!-- 图片上传区域 -->
+                                <div class="image-upload-container">
+                                    <div class="image-upload-btn" onclick="document.getElementById('image-upload').click()">
+                                        <i class="fa fa-image"></i>
+                                        <span>添加图片</span>
+                                    </div>
+                                    <input type="file" id="image-upload" class="image-upload-input" accept="image/*" multiple onchange="handleImageUpload(event)">
+                                    <p style="margin-top: 10px; color: #a0aec0; font-size: 0.9rem;">支持上传JPG、PNG格式，每张图片不超过5MB</p>
+                                </div>
+                                
+                                <!-- 图片预览区域 -->
+                                <div class="image-preview-container" id="image-preview-container">
+                                    <!-- 预览图片将动态添加到这里 -->
+                                </div>
+                                
+                                <div style="display: flex; justify-content: flex-end; margin-top: 10px; gap: 10px;">
+                                    <button class="btn btn-secondary" onclick="clearThoughtInput()">
+                                        <i class="fa fa-trash"></i> 清空
+                                    </button>
+                                    <button class="btn btn-primary" id="post-thought">
+                                        <i class="fa fa-paper-plane"></i> 发布到 GitHub
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- 想法列表 -->
-                        <div class="thoughts-list" id="thoughts-list">
-                            <!-- 动态加载 -->
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <h4 class="history-title">历史想法</h4>
+                            <div class="thoughts-list" id="thoughts-list">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>加载想法中...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,13 +465,15 @@
             <footer>
                 <div id="footer-wrap">
                     <div class="copyright">&copy; 2023 百夜 | 数据存储于 GitHub Issues</div>
-                    <div style="margin-top: 10px;">
-                        <a href="index.html" class="btn btn-secondary btn-small" 
-                           style="text-decoration: none; margin-right: 10px;">
+                    <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+                        <a href="index.html" class="btn btn-secondary btn-small" style="text-decoration: none;">
                             <i class="fa fa-eye"></i> 查看前台
                         </a>
-                        <button class="btn btn-secondary btn-small" onclick="syncAllData()">
-                            <i class="fa fa-refresh"></i> 同步数据
+                        <button class="btn btn-secondary btn-small" onclick="checkGitHubStatus()">
+                            <i class="fa fa-info-circle"></i> GitHub 状态
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="logout()">
+                            <i class="fa fa-sign-out"></i> 退出登录
                         </button>
                     </div>
                 </div>
@@ -210,213 +486,487 @@
         </div>
     </div>
 
+    <!-- 图片查看模态框 -->
+    <div id="image-viewer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="position: relative; max-width: 90%; max-height: 90%;">
+            <img id="viewed-image" src="" alt="" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
+            <button onclick="closeImageViewer()" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">×</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+    
     <script>
-        // GitHub OAuth 配置
-        const GITHUB_CONFIG = {
-    clientId: '你的_GITHUB_CLIENT_ID',  // 从 GitHub OAuth App 获取
-    redirectUri: '你的_VERCEL_URL/admin.html', // 例如：https://your-app.vercel.app/admin.html
-    apiEndpoint: '你的_VERCEL_URL/api/github-auth' // 例如：https://your-app.vercel.app/api/github-auth
-};
-        // 检查授权状态
-        function checkAuth() {
-            const token = localStorage.getItem('github_access_token');
-            const user = localStorage.getItem('github_user');
-            
-            if (token && user) {
-                // 已授权，显示主界面
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('app-container').style.display = 'block';
-                displayUserInfo(JSON.parse(user));
-                initializeApp();
-            } else {
-                // 未授权，显示登录界面
-                document.getElementById('auth-container').style.display = 'block';
-                document.getElementById('app-container').style.display = 'none';
+        // ==================== GitHub API 工具类 ====================
+        class GitHubAPI {
+            constructor(token, username, repo) {
+                this.token = token;
+                this.username = username;
+                this.repo = repo;
+                this.baseURL = 'https://api.github.com';
+            }
+
+            async request(endpoint, options = {}) {
+                const url = `${this.baseURL}${endpoint}`;
                 
-                // 检查 URL 中是否有授权码
-                const code = getQueryParam('code');
-                if (code) {
-                    exchangeCodeForToken(code);
+                const headers = {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    ...options.headers
+                };
+
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        headers
+                    });
+
+                    // 检查响应状态
+                    if (response.status === 401) {
+                        throw new Error('Token 已过期或无效，请重新登录');
+                    }
+
+                    if (response.status === 403) {
+                        const resetTime = response.headers.get('X-RateLimit-Reset');
+                        if (resetTime) {
+                            const resetDate = new Date(resetTime * 1000);
+                            throw new Error(`API 请求受限，将在 ${resetDate.toLocaleTimeString()} 恢复`);
+                        }
+                        throw new Error('权限不足，请检查 token 权限');
+                    }
+
+                    if (response.status === 404) {
+                        throw new Error('仓库不存在或无权访问');
+                    }
+
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => ({}));
+                        throw new Error(error.message || `请求失败: ${response.status}`);
+                    }
+
+                    // 检查速率限制
+                    const remaining = response.headers.get('X-RateLimit-Remaining');
+                    const limit = response.headers.get('X-RateLimit-Limit');
+                    
+                    if (parseInt(remaining) < 10) {
+                        showSyncStatus(`API 请求次数即将用完 (${remaining}/${limit})`, 'warning');
+                    }
+
+                    return response.json();
+                } catch (error) {
+                    console.error('GitHub API 请求失败:', error);
+                    throw error;
                 }
             }
-        }
 
-        // 获取 URL 参数
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // GitHub 登录
-       function githubLogin() {
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientId}&redirect_uri=${encodeURIComponent(GITHUB_CONFIG.redirectUri)}&scope=repo`;
-    window.location.href = authUrl;
-}
-
-        // 用 code 交换 token
-       async function exchangeCodeForToken(code) {
-    try {
-        // 调用我们的无服务器函数
-        const response = await fetch(`${GITHUB_CONFIG.apiEndpoint}?code=${code}`);
-        const data = await response.json();
-        
-        if (data.access_token) {
-            // 保存 token 和用户信息
-            localStorage.setItem('github_access_token', data.access_token);
-            localStorage.setItem('github_user', JSON.stringify(data.user));
-            
-            // 清除 URL 中的 code 参数
-            window.history.replaceState({}, document.title, window.location.pathname);
-            
-            // 重新加载页面
-            window.location.reload();
-        } else {
-            throw new Error(data.error || 'Authentication failed');
-        }
-    } catch (error) {
-        console.error('获取 token 失败:', error);
-        alert('授权失败: ' + error.message);
-    }
-}
-
-
-        // 显示用户信息
-        function displayUserInfo(user) {
-            const userInfoDiv = document.getElementById('user-info');
-            userInfoDiv.innerHTML = `
-                <img src="${user.avatar_url}" class="user-avatar" alt="${user.login}">
-                <div>
-                    <div style="font-weight: bold;">${user.name || user.login}</div>
-                    <div style="font-size: 12px; color: #a0aec0;">${user.login}</div>
-                </div>
-                <button class="btn btn-secondary btn-small" onclick="logout()" style="margin-left: auto;">
-                    <i class="fa fa-sign-out"></i>
-                </button>
-            `;
-        }
-
-        // 登出
-        function logout() {
-            localStorage.removeItem('github_access_token');
-            localStorage.removeItem('github_user');
-            window.location.reload();
-        }
-
-        // 应用初始化
-        function initializeApp() {
-            // 这里初始化你的番茄钟、想法发布等功能
-            // 使用前面定义的 GitHub API 函数来操作数据
-            
-            // 示例：加载已有数据
-            loadThoughts();
-            loadTodayMood();
-            
-            // 初始化事件监听
-            document.getElementById('post-thought').addEventListener('click', postThought);
-            
-            // 初始化番茄钟
-            initializePomodoro();
-        }
-
-        // 发布想法
-        async function postThought() {
-            const content = document.getElementById('new-thought').value.trim();
-            if (!content) {
-                alert('请输入想法内容');
-                return;
+            // 测试连接
+            async testConnection() {
+                try {
+                    const user = await this.request('/user');
+                    const repo = await this.request(`/repos/${this.username}/${this.repo}`);
+                    return {
+                        success: true,
+                        user: user.login,
+                        repo: repo.name,
+                        permissions: repo.permissions
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
             }
-            
-            try {
-                await createIssue(
-                    content.substring(0, 50) + (content.length > 50 ? '...' : ''),
-                    JSON.stringify({ content }),
-                    [GITHUB_CONFIG.labels.thought]
-                );
+
+            // 创建 Issue
+            async createIssue(title, body, labels = []) {
+                return this.request(`/repos/${this.username}/${this.repo}/issues`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        title, 
+                        body, 
+                        labels: [...labels, 'personal-blog']
+                    })
+                });
+            }
+
+            // 获取 Issues
+            async getIssues(params = {}) {
+                let endpoint = `/repos/${this.username}/${this.repo}/issues`;
+                const queryParams = [];
                 
-                document.getElementById('new-thought').value = '';
-                showSyncStatus('想法发布成功', 'success');
-                loadThoughts(); // 重新加载列表
-            } catch (error) {
-                console.error('发布失败:', error);
-                showSyncStatus('发布失败', 'error');
+                if (params.labels && params.labels.length > 0) {
+                    queryParams.push(`labels=${params.labels.join(',')}`);
+                }
+                if (params.state) {
+                    queryParams.push(`state=${params.state}`);
+                }
+                if (params.per_page) {
+                    queryParams.push(`per_page=${params.per_page}`);
+                }
+                if (params.page) {
+                    queryParams.push(`page=${params.page}`);
+                }
+                
+                if (queryParams.length > 0) {
+                    endpoint += `?${queryParams.join('&')}`;
+                }
+                
+                return this.request(endpoint);
             }
-        }
 
-        // 保存心情
-        async function saveMood() {
-            const moodContent = document.getElementById('mood-editor').innerText.trim();
-            if (!moodContent || moodContent === '记录今天的心情...') {
-                alert('请输入心情内容');
-                return;
+            // 获取用户的所有仓库
+            async getUserRepos() {
+                return this.request('/user/repos?per_page=100&sort=updated');
             }
-            
-            try {
-                // 检查今天是否已有心情记录
+
+            // 创建仓库（如果不存在）
+            async createRepoIfNotExists() {
+                try {
+                    // 先尝试获取仓库
+                    await this.request(`/repos/${this.username}/${this.repo}`);
+                    return { created: false, message: '仓库已存在' };
+                } catch (error) {
+                    if (error.message.includes('404') || error.message.includes('不存在')) {
+                        // 仓库不存在，创建新仓库
+                        const newRepo = await this.request('/user/repos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: this.repo,
+                                description: '个人博客数据存储仓库',
+                                private: true, // 建议设为私有
+                                auto_init: true,
+                                has_issues: true,
+                                has_wiki: false,
+                                has_projects: false
+                            })
+                        });
+                        return { created: true, repo: newRepo };
+                    }
+                    throw error;
+                }
+            }
+
+            // 获取今日心情
+            async getTodayMood() {
                 const today = new Date().toISOString().split('T')[0];
-                const issues = await getIssues(GITHUB_CONFIG.labels.mood);
-                const todayMood = issues.find(issue => 
-                    new Date(issue.created_at).toISOString().split('T')[0] === today
-                );
+                const issues = await this.getIssues({ 
+                    labels: ['mood', 'personal-blog'],
+                    per_page: 100 
+                });
+                
+                return issues.find(issue => {
+                    const issueDate = new Date(issue.created_at).toISOString().split('T')[0];
+                    return issueDate === today;
+                });
+            }
+
+            // 保存今日心情
+            async saveTodayMood(content) {
+                const todayMood = await this.getTodayMood();
                 
                 if (todayMood) {
-                    // 更新已有记录
-                    await updateIssue(todayMood.number, {
-                        body: moodContent
-                    });
+                    // 更新已有心情
+                    return this.updateIssue(todayMood.number, { body: content });
                 } else {
-                    // 创建新记录
-                    await createIssue(
-                        `心情记录 - ${today}`,
-                        moodContent,
-                        [GITHUB_CONFIG.labels.mood]
-                    );
+                    // 创建新心情
+                    const today = new Date().toLocaleDateString('zh-CN');
+                    return this.createIssue(`心情记录 - ${today}`, content, ['mood']);
+                }
+            }
+
+            // 发布想法
+            async postThought(content, images = []) {
+                const timestamp = new Date().toLocaleString('zh-CN');
+                const thoughtData = {
+                    content,
+                    timestamp,
+                    images,
+                    type: 'thought'
+                };
+                
+                const title = content.length > 50 
+                    ? content.substring(0, 47) + '...' 
+                    : content;
+                
+                return this.createIssue(title, JSON.stringify(thoughtData, null, 2), ['thought']);
+            }
+
+            // 记录番茄钟完成
+            async recordPomodoro(duration = 25, type = 'work') {
+                const timestamp = new Date().toLocaleString('zh-CN');
+                const pomodoroData = {
+                    duration,
+                    timestamp,
+                    type,
+                    completed: true
+                };
+                
+                const title = `番茄钟完成 - ${type === 'work' ? '专注' : '休息'} ${duration}分钟`;
+                return this.createIssue(title, JSON.stringify(pomodoroData), ['pomodoro']);
+            }
+
+            // 获取统计数据
+            async getStatistics() {
+                const [thoughts, pomodoros, moods] = await Promise.all([
+                    this.getIssues({ labels: ['thought', 'personal-blog'], state: 'all', per_page: 1 }),
+                    this.getIssues({ labels: ['pomodoro', 'personal-blog'], state: 'all', per_page: 1 }),
+                    this.getIssues({ labels: ['mood', 'personal-blog'], state: 'all', per_page: 1 })
+                ]);
+                
+                // 注意：这里获取的是第一页，仅用于计数
+                // 实际应用中可能需要获取所有数据来准确计数
+                
+                return {
+                    thoughts: thoughts.length,
+                    pomodoros: pomodoros.length,
+                    moods: moods.length
+                };
+            }
+
+            // 更新 Issue
+            async updateIssue(issueNumber, updates) {
+                return this.request(`/repos/${this.username}/${this.repo}/issues/${issueNumber}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updates)
+                });
+            }
+        }
+
+        // ==================== 全局变量和配置 ====================
+        const CONFIG = {
+            // 你的 GitHub OAuth App Client ID
+            clientId: 'YOUR_GITHUB_CLIENT_ID',
+            // 默认仓库名（用户可修改）
+            defaultRepo: 'personal-blog-data',
+            // API 端点（部署后修改为你的 Vercel URL）
+            apiEndpoint: window.location.origin.includes('localhost') 
+                ? 'http://localhost:3000/api/github-auth'
+                : '你的_VERCEL_URL/api/github-auth'
+        };
+
+        let githubAPI = null;
+        let currentUser = null;
+        let currentRepo = null;
+        let uploadedImages = [];
+
+        // ==================== OAuth 相关函数 ====================
+        function githubLogin() {
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${CONFIG.clientId}&redirect_uri=${encodeURIComponent(window.location.href)}&scope=repo`;
+            window.location.href = authUrl;
+        }
+
+        async function exchangeCodeForToken(code) {
+            showSyncStatus('正在交换授权码...', 'info');
+            
+            try {
+                const response = await fetch(`${CONFIG.apiEndpoint}?code=${code}`);
+                const data = await response.json();
+                
+                if (data.access_token) {
+                    // 保存 token 和用户信息
+                    localStorage.setItem('github_access_token', data.access_token);
+                    localStorage.setItem('github_user', JSON.stringify(data.user));
+                    
+                    // 清除 URL 中的 code 参数
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    showSyncStatus('授权成功！', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(data.error || '授权失败');
+                }
+            } catch (error) {
+                console.error('获取 token 失败:', error);
+                showSyncStatus('授权失败: ' + error.message, 'error');
+            }
+        }
+
+        // ==================== 应用初始化函数 ====================
+        async function initializeApp() {
+            showSyncStatus('初始化应用中...', 'info');
+            
+            try {
+                // 获取用户信息
+                const userStr = localStorage.getItem('github_user');
+                if (!userStr) throw new Error('用户信息不存在');
+                
+                currentUser = JSON.parse(userStr);
+                displayUserInfo(currentUser);
+                
+                // 初始化 GitHub API
+                const token = localStorage.getItem('github_access_token');
+                if (!token) throw new Error('Token 不存在');
+                
+                // 获取仓库列表
+                const tempAPI = new GitHubAPI(token, currentUser.login, 'temp');
+                const repos = await tempAPI.getUserRepos();
+                
+                // 填充仓库选择器
+                const repoSelect = document.getElementById('repo-select');
+                repoSelect.innerHTML = '<option value="">选择仓库...</option>';
+                repos.forEach(repo => {
+                    const option = document.createElement('option');
+                    option.value = repo.name;
+                    option.textContent = repo.name + (repo.private ? ' 🔒' : '');
+                    if (repo.name === CONFIG.defaultRepo) {
+                        option.selected = true;
+                        currentRepo = repo.name;
+                    }
+                    repoSelect.appendChild(option);
+                });
+                
+                repoSelect.addEventListener('change', async (e) => {
+                    currentRepo = e.target.value;
+                    if (currentRepo) {
+                        await initGitHubAPI();
+                        await loadAllData();
+                    }
+                });
+                
+                if (currentRepo) {
+                    await initGitHubAPI();
+                    await loadAllData();
                 }
                 
-                showSyncStatus('心情保存成功', 'success');
+                showSyncStatus('应用初始化完成', 'success');
+                
             } catch (error) {
-                console.error('保存心情失败:', error);
-                showSyncStatus('保存失败', 'error');
+                console.error('初始化失败:', error);
+                showSyncStatus('初始化失败: ' + error.message, 'error');
             }
         }
 
-        // 显示同步状态
-        function showSyncStatus(message, type = 'info') {
-            const statusDiv = document.getElementById('sync-status');
-            statusDiv.innerHTML = '';
-            statusDiv.className = 'sync-status';
-            
-            if (type === 'success') {
-                statusDiv.classList.add('sync-success');
-                statusDiv.innerHTML = `<i class="fa fa-check"></i> ${message}`;
-            } else if (type === 'error') {
-                statusDiv.classList.add('sync-error');
-                statusDiv.innerHTML = `<i class="fa fa-exclamation-triangle"></i> ${message}`;
-            } else {
-                statusDiv.innerHTML = `<i class="fa fa-info-circle"></i> ${message}`;
+        async function initGitHubAPI() {
+            const token = localStorage.getItem('github_access_token');
+            if (!token || !currentUser || !currentRepo) {
+                throw new Error('缺少必要信息');
             }
             
-            statusDiv.style.display = 'block';
+            githubAPI = new GitHubAPI(token, currentUser.login, currentRepo);
             
-            // 3秒后自动隐藏
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 3000);
+            // 测试连接
+            const result = await githubAPI.testConnection();
+            if (!result.success) {
+                // 尝试创建仓库
+                if (result.error.includes('不存在')) {
+                    showSyncStatus('仓库不存在，尝试创建...', 'warning');
+                    try {
+                        await githubAPI.createRepoIfNotExists();
+                        showSyncStatus('仓库创建成功！', 'success');
+                    } catch (createError) {
+                        throw new Error('创建仓库失败: ' + createError.message);
+                    }
+                } else {
+                    throw new Error('连接测试失败: ' + result.error);
+                }
+            }
         }
 
-        // 页面加载时检查授权
-        document.addEventListener('DOMContentLoaded', function() {
-    // 检查 URL 中是否有授权码
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    
-    if (code) {
-        // 有授权码，进行交换
-        exchangeCodeForToken(code);
-    } else {
-        // 没有授权码，检查是否已登录
-        checkAuth();
-    }
-});
-    </script>
-</body>
-</html>
+        // ==================== 数据操作函数 ====================
+        async function loadAllData() {
+            if (!githubAPI) return;
+            
+            showSyncStatus('加载数据中...', 'info');
+            
+            try {
+                // 并行加载所有数据
+                await Promise.all([
+                    loadTodayMood(),
+                    loadThoughts(),
+                    loadPomodoroData(),
+                    loadStatistics()
+                ]);
+                
+                showSyncStatus('数据加载完成', 'success');
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showSyncStatus('加载失败: ' + error.message, 'error');
+            }
+        }
+
+        async function loadTodayMood() {
+            if (!githubAPI) return;
+            
+            try {
+                const todayMood = await githubAPI.getTodayMood();
+                const moodEditor = document.getElementById('mood-editor');
+                
+                if (todayMood) {
+                    moodEditor.innerHTML = todayMood.body.replace(/\n/g, '<br>');
+                    moodEditor.classList.remove('mood-placeholder');
+                } else {
+                    moodEditor.innerHTML = '点击这里记录今天的心情...';
+                    moodEditor.classList.add('mood-placeholder');
+                }
+            } catch (error) {
+                console.error('加载心情失败:', error);
+            }
+        }
+
+        async function loadThoughts() {
+            if (!githubAPI) return;
+            
+            try {
+                const thoughts = await githubAPI.getIssues({ 
+                    labels: ['thought', 'personal-blog'],
+                    per_page: 20 
+                });
+                const thoughtsList = document.getElementById('thoughts-list');
+                
+                if (thoughts.length === 0) {
+                    thoughtsList.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #a0aec0;">
+                            <i class="fa fa-pencil" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>还没有发布任何想法</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">写下你的第一份思考吧！</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                thoughts.forEach(issue => {
+                    const createTime = new Date(issue.created_at).toLocaleString('zh-CN');
+                    let thoughtData;
+                    try {
+                        thoughtData = JSON.parse(issue.body || '{}');
+                    } catch (e) {
+                        thoughtData = { content: issue.body || issue.title };
+                    }
+                    
+                    let imagesHtml = '';
+                    if (thoughtData.images && thoughtData.images.length > 0) {
+                        imagesHtml = '<div class="thought-images">';
+                        thoughtData.images.forEach((img, index) => {
+                            imagesHtml += `
+                                <div class="thought-image-item" onclick="viewImage('${img}')">
+                                    <img src="${img}" alt="图片${index + 1}">
+                                </div>
+                            `;
+                        });
+                        imagesHtml += '</div>';
+                    }
+                    
+                    html += `
+                        <div class="thought-item">
+                            <div class="thought-header">
+                                <img src="${currentUser.avatar_url}" class="thought-avatar" alt="${currentUser.login}">
+                                <div>
+                                    <div class="thought-author">${currentUser.name || currentUser.login}</div>
+                                    <div class="thought
